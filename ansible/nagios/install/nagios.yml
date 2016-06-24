@@ -1,0 +1,15 @@
+---
+#
+# Playbook to install nagios
+#
+
+# we need to collect facts from all hosts we reference
+# https://github.com/ansible/ansible/issues/9260
+- hosts: all
+  remote_user: root
+  tasks: []
+
+- hosts: nagios
+  remote_user: root
+  roles:
+    - { role: nagios }

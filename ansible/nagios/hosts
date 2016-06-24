@@ -1,0 +1,8 @@
+[nagios]
+host-01
+
+[webservers]
+
+[switches]
+
+[oobservers]
