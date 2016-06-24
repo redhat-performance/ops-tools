@@ -165,6 +165,9 @@ function rebuild {
     rmdir $tmpdir
 }
 
+# sleep for slower machines
+sleep 5
+
 cd /var/lib/libvirt/images/
 
 for h in "${!guests[@]}" ; do
@@ -174,6 +177,9 @@ done
 
 virsh net-destroy default
 virsh net-start default
+
+# sleep for slower machines
+sleep 5
 
 for h in "${!guests[@]}" ; do
   virsh start $h
