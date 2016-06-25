@@ -6,7 +6,7 @@ Ansible Playbook for setting up the Nagios monitoring system and clients
    - Automated deployment of Nagios on CentOS or RHEL
      * Generates service checks, and monitored hosts from Ansible inventory
      * Wraps Nagios in SSL via Apache
-     * Templating inspired from the official [ansible examples](https://github.com/ansible/ansible-examples)
+     * Sets up firewall rules (firewalld or iptables-services)
 
 **Requirements**
    - RHEL7 or CentOS7+ server/client
@@ -14,10 +14,10 @@ Ansible Playbook for setting up the Nagios monitoring system and clients
 **Notes**
    - Sets the ```nagiosadmin``` password to ```changeme```, you'll want to change this.
    - Implementation is very simple, with only the following server types generated right now:
-     - out-of-band interfaces (Dell iDRAC, IPMI etc) (ping/ssh)
-     - generic servers (ping, ssh, users, load, swap)
-     - webservers (http check, ping, ssh, users, load, swap)
-     - network switches (ping/ssh)
+     - out-of-band interfaces *(ping, ssh, http)*
+     - generic servers *(ping, ssh, users, load, swap)*
+     - webservers *(http check, ping, ssh, users, load, swap)*
+     - network switches *(ping, ssh)*
    - I do not setup the ```contacts.cfg``` file for notifications
 
 **Nagios Server Instructions**
