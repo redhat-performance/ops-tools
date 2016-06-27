@@ -4,7 +4,7 @@ Ansible Playbook for setting up the Nagios monitoring system and clients
 
 **What does it do?**
    - Automated deployment of Nagios on CentOS or RHEL
-     * Generates service checks, and monitored hosts from Ansible inventory
+     * Generates service checks, and monitored hosts from the Ansible inventory
      * Wraps Nagios in SSL via Apache
      * Sets up firewall rules (firewalld or iptables-services)
 
@@ -18,7 +18,7 @@ Ansible Playbook for setting up the Nagios monitoring system and clients
      - generic servers *(ping, ssh, users, load, swap)*
      - webservers *(http check, ping, ssh, users, load, swap)*
      - network switches *(ping, ssh)*
-   - I do not setup the ```contacts.cfg``` file for notifications
+   - ```contacts.cfg``` is configurable as a template also, see ```install/group_vars/all.yml``` to change notification emails.
 
 **Nagios Server Instructions**
    - Clone repo and setup your hosts file
