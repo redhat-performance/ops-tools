@@ -1,12 +1,14 @@
 ansible-idrac
 #############
+
 Playbook to manage idrac out-of-band interfaces with Ansible.
 
 **What does it do?**
-   - Automated deployment of Nagios on CentOS or RHEL
-     * Generates service checks, and monitored hosts from the Ansible inventory
-     * Wraps Nagios in SSL via Apache
-     * Sets up firewall rules (firewalld or iptables-services)
+   - Manage Dell iDRAC interfaces with Ansible
+     * Change iDRAC passwords
+     * Query physical and virtual disks
+     * Set up hardware RAID
+     * Change NIC boot order
 
 **Requirements**
    - iDRAC Enterprise 7+
@@ -17,6 +19,7 @@ Playbook to manage idrac out-of-band interfaces with Ansible.
    - This assumes you have root SSH keys on the resources.
 
 **(Setup) Deploy SSH keys on iDRAC**
+
 Run the following to setup SSH on your iDRACS, you'll need this to proceed.
 
 ```
@@ -26,6 +29,7 @@ for mgmt in list_your_hosts_here ; do ip=$(host $mgmt | awk '{ print $NF }'); /o
 ```
 
 **Change iDRAC Passwords**
+
 To change the root passwords on the iDRAC
 
 ```
@@ -45,6 +49,7 @@ ansible-playbook -i /etc/ansible/foreman_ansible_inventory.py -l ~"mgmt-c.\*-h.\
 ```
 
 **Setup Hardware RAID**
+
 To setup hardware raid (Do NOT do this against the foreman host)
   - Use this for 2 disk systems, e.g. R630 hosts
   - For the following two examples, assume your r630 dracs match the hostname form: mgmt-c.*-h.*r630.example.com
@@ -54,6 +59,7 @@ ansible-playbook -i /etc/ansible/foreman_ansible_inventory.py -l ~"mgmt-c.\*-h.\
 ```
 
 **Setup NIC Boot Order**
+
 To setup boot order (Do NOT do this against the foreman host)
   - Use this for the R630 hosts for example
 
