@@ -1,0 +1,103 @@
+---
+- gather_facts: False
+  name: check for racadm
+  vars:
+    untouchables: mgmt-foreman.example.com
+  hosts: all:!{{untouchables}}
+  tasks:
+
+# ensure 2nd interface can PXE
+    - name: racadm setup NIC2
+      raw: racadm set NIC.NICConfig.2.LegacyBootProto PXE
+      args:
+        executable: ''
+      register: result_nicconfig
+    - debug: var=result_nicconfig
+
+# Delete the jobqueue to we can search it reliably later
+    - name: racadm jobqueue delete
+      raw: racadm jobqueue delete --all
+      args:
+        executable: ''
+      register: result_jobqueue
+    - debug: var=result_jobqueue
+
+# Ensure we are starting with a powered down system
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+# Commit the changes to the 2nd NIC
+    - name: racadm NIC reconfig
+      raw: racadm jobqueue create NIC.Integrated.1-2-1 -r pwrcycle -s TIME_NOW
+      args:
+        executable: ''
+      register: result_pwrcycle
+    - debug: var=result_pwrcycle
+
+# Now wait for the jobqueue to finish
+    - name: racadm check complete
+      raw: racadm jobqueue view
+      args:
+        executable: ''
+      register: result_check_complete
+      until: result_check_complete.stdout.find("Status=Completed") != -1 and result_check_complete.stdout.find("Status=Running") == -1
+      retries: 2000
+      delay: 10
+    - debug: var=result_check_complete
+
+# Turn off the server
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+# Delete the jobqueue to we can search it reliably later
+    - name: racadm jobqueue delete
+      raw: racadm jobqueue delete --all
+      args:
+        executable: ''
+      register: result_jobqueue
+    - debug: var=result_jobqueue
+
+# setup the new boot order to ensure 2nd nic is before disk
+    - name: racadm setup boot
+      raw: racadm set BIOS.BiosBootSettings.BootSeq NIC.Integrated.1-1-1,NIC.Integrated.1-2-1,HardDisk.List.1-1
+      args:
+        executable: ''
+      register: result_boot_setup
+    - debug: var=result_boot_setup
+
+# Commit the changes to the bios
+    - name: racadm bios reconfigure powercycle
+      raw: racadm jobqueue create BIOS.Setup.1-1 -r pwrcycle -s TIME_NOW
+      args:
+        executable: ''
+      register: result_pwrcycle
+    - debug: var=result_pwrcycle
+
+# Now wait for the jobqueue to finish
+    - name: racadm check complete
+      raw: racadm jobqueue view
+      args:
+        executable: ''
+      register: result_check_complete
+      until: result_check_complete.stdout.find("Status=Completed") != -1 and result_check_complete.stdout.find("Status=Running") == -1
+      retries: 2000
+      delay: 10
+    - debug: var=result_check_complete
+
+# Turn off the server
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+

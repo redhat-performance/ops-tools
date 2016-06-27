@@ -1,0 +1,14 @@
+---
+- gather_facts: False
+  name: check for racadm
+  vars:
+    untouchables: mgmt-foreman.example.com
+  hosts: all:!{{untouchables}}
+  tasks:
+    - name: racadm check
+      raw: racadm raid get vdisks
+      args:
+        executable: ''
+      register: result_check
+    - debug: msg="{{ result_check.stdout_lines }}"
+
