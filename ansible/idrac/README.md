@@ -1,5 +1,5 @@
 ansible-idrac
-#############
+=============
 
 Playbook to manage idrac out-of-band interfaces with Ansible.
 
