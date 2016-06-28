@@ -6,9 +6,9 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
 
 **What does it do?**
    - Automated deployment of Nagios on CentOS or RHEL
-     * Generates service checks and monitored hosts from Ansible inventory
+     * Generates service checks, and monitored hosts from Ansible inventory
      * Generates comprehensive checks for the Nagios server
-     * Sets up NRPE on all monitored servers for comprehensive service checks
+     * Generates comprehensive checks for all hosts/services via NRPE
      * Wraps Nagios in SSL via Apache
      * Sets up proper firewall rules (firewalld or iptables-services)
 
@@ -19,10 +19,11 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
    - Sets the ```nagiosadmin``` password to ```changeme```, you'll want to change this.
    - Implementation is very simple, with only the following server types generated right now:
      - out-of-band interfaces *(ping, ssh, http)*
-     - generic servers *(ping, ssh)*
-     - webservers *(http, ping, ssh)*
+     - generic servers *(ping, ssh, load, users, procs, uptime, disk space)*
+     - webservers *(http, ping, ssh, load, users, procs, uptime, disk space)*
      - network switches *(ping, ssh)*
    - ```contacts.cfg``` notification settings are in ```install/group_vars/all.yml``` and templated for easy modification.
+   - Adding new hosts to inventory file will just regenerate the Nagios configs
 
 **Nagios Server Instructions**
    - Clone repo and setup your Ansible inventory (hosts) file
@@ -53,6 +54,10 @@ ansible-playbook -i hosts install/elk.yml
 ```
    - Navigate to the server at https://yourhost/nagios
    - Default login is ```nagiosadmin / changeme``` unless you changed it in ```install/group_vars/all.yml```
+
+**Demonstration**
+   - You can view a video of the Ansible deployment here:
+[![Ansible Nagios](http://img.youtube.com/vi/6vfhflwC_Wg/0.jpg)](http://www.youtube.com/watch?v=6vfhflwC_Wg "Deploying Nagios with Ansible")
 
 **Files**
 
