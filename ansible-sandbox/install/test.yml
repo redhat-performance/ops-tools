@@ -1,0 +1,11 @@
+---
+#
+# Playbook to test ansible variables, tasks
+# and other things without using a full-blown
+# playbook.
+#
+
+- hosts: test
+  remote_user: root
+  roles:
+    - { role: test }

@@ -1,0 +1,11 @@
+---
+# arbitrary testing here
+
+- name: Check Operating System
+  fail:
+    debug: Msg="You're not running a supported Operating System"
+  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int >= 7
+
+- name: Example Debug Message 1
+  debug:
+    Msg="My root disk is called {{ ansible_mounts[0]['device'] }}"
