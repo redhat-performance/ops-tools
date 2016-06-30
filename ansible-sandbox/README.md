@@ -10,5 +10,5 @@ Simple sandbox structure for quickly testing Ansible
    - You might use this to quickly test variables, facts and other things
      without the complexity of running an entire playbook.
 
-![Sandbox](/image/tmux-test-example.png?raw=true)
 
+![Test](/image/tmux-test-example.png?raw=true "Common Testing Usage")
