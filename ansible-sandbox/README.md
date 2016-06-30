@@ -11,4 +11,4 @@ Simple sandbox structure for quickly testing Ansible
      without the complexity of running an entire playbook.
 
 
-![Test](/image/tmux-test-example.png?raw=true "Common Testing Usage")
+![testing](/image/example.png "Common Testing Usage")
