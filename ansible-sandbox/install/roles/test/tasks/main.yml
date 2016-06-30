@@ -3,9 +3,13 @@
 
 - name: Check Operating System
   fail:
-    debug: Msg="You're not running a supported Operating System"
-  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int >= 7
+    debug: msg="You're not running a supported Operating System"
+  when: ((ansible_os_family != "RedHat") or (ansible_distribution_major_version|int < 7))
 
 - name: Example Debug Message 1
   debug:
-    Msg="My root disk is called {{ ansible_mounts[0]['device'] }}"
+    msg="My root disk is called {{ ansible_mounts[0]['device'] }}"
+
+- name: Example Debug Message 2
+  debug:
+    msg="My IP address is {{ ansible_default_ipv4.address }}"

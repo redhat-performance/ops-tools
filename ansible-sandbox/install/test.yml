@@ -5,6 +5,10 @@
 # playbook.
 #
 
+- hosts: all:!switches:!oobservers
+  remote_user: root
+  tasks: []
+
 - hosts: test
   remote_user: root
   roles:
