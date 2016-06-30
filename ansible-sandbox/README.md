@@ -11,4 +11,4 @@ Simple sandbox structure for quickly testing Ansible
      without the complexity of running an entire playbook.
 
 
-![testing](/image/example.png "Common Testing Usage")
+![testing](/ansible-sandbox/image/example.png "Common Testing Usage")
