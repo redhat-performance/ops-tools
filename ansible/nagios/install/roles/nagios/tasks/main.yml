@@ -36,9 +36,7 @@
     - nagios-common
     - nagios-plugins-ssh
     - nagios-plugins-tcp
-    - nagios-plugins-fping
     - nagios-plugins-http
-    - nagios-plugins-icmp
     - nagios-plugins-load
     - nagios-plugins-nrpe
     - nagios-plugins-uptime
@@ -47,6 +45,7 @@
     - nagios-plugins-procs
     - nagios-plugins-users
     - nagios-plugins-disk
+    - libsemanage-python
 
 - name: Check nagios Users
   stat: path=/etc/nagios/passwd
@@ -63,11 +62,6 @@
   command: htpasswd -b -c /etc/nagios/passwd {{nagios_username}} {{nagios_password}}
   ignore_errors: true
   when: nagios_user_pwfile_exists != 0
-- name: Disable EPEL Repo
-  ini_file: dest=/etc/yum.repos.d/epel.repo
-    section=epel
-    option=enabled
-    value=0
 
 - name: Configure nagios main configuration
   copy: src=nagios.cfg dest=/etc/nagios/nagios.cfg
@@ -78,7 +72,7 @@
 - name: Create generic nagios services config
   copy: src=services.cfg dest=/etc/nagios/
 
-- name: Create the nagios object files
+- name: Generate the nagios monitoring templates
   template: src={{ item + ".j2" }}
             dest=/etc/nagios/conf.d/{{ item }}
   with_items:
@@ -86,7 +80,14 @@
     - switches.cfg
     - webservers.cfg
     - servers.cfg
+    - commands.cfg
   register: nagios_needs_restart
+
+- name: Generate the nagios contact template
+  template: src={{ item + ".j2" }}
+            dest=/etc/nagios/objects/{{ item }}
+  with_items:
+    - contacts.cfg
 
 # SELinux boolean for nagios
 - name: Apply SELinux boolean nagios_run_sudo
@@ -103,7 +104,21 @@
   file:
     path=/var/log/nagios/rw
     state=directory
+    owner=nagios
+    group=nagios
     mode=0777
+    seuser=system_u
+
+# employ lineinfile fix for faulty, shipped nagios systemd service
+- name: Check/fix systemd service file
+  lineinfile: dest=/usr/lib/systemd/system/nagios.service \
+          regexp="^ExecStopPost=" \
+          line="ExecStopPost=/usr/bin/rm -f /var/spool/nagios/cmd/nagios.cmd /var/log/nagios/rw/nagios.qh"
+  register: systemd_nagios_changed
+
+- name: Reload Systemd if needed
+  command: systemctl daemon-reload
+  when: systemd_nagios_changed !=0
 
 ### begin firewall ###
 # we need TCP/80 and TCP/443 open
@@ -219,7 +234,6 @@
 
 - name: Start nagios service
   command: systemctl restart nagios.service
-  ignore_errors: true
   when: nagios_needs_restart != 0
 
 - name: Set nagios to start on boot
