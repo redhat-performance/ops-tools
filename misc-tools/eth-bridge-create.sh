@@ -55,7 +55,7 @@ check_br_exist()
 
 create_br_int()
 {  # bring up bridged interface, make primary
-   cp /etc/sysconfig/network-scripts/ifcfg-$ethname /etc/sysconfig/network-scripts/ifcfg-$bridgename
+   cp /etc/sysconfig/network-scripts/ifcfg-$ethname /etc/sysconfig/network-scripts/ifcfg-$bridgename 
    sed -i 's/IPADDR/#IPADDR/g' /etc/sysconfig/network-scripts/ifcfg-$ethname
    sed -i 's/NETMASK/#NETMASK/g' /etc/sysconfig/network-scripts/ifcfg-$ethname
    sed -i 's/GATEWAY/#GATEWAY/g' /etc/sysconfig/network-scripts/ifcfg-$ethname
