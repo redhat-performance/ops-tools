@@ -1,0 +1,28 @@
+---
+# All variables needed to deploy cloud07
+
+rhos_release_rpm:
+
+# OSP/OSPd versioning and build
+version: 10
+rhos_release: 10-director
+build: "2016-08-29.1"
+
+# Stack user password:
+# Make a new password:
+# python -c "from passlib.hash import sha512_crypt; print sha512_crypt.encrypt('password')"
+stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsTCIWSAZevFapJIq2OS/qATHQ39PwsJ6JusOBue3nxeNm5mTBM3m97EnQ.
+
+# undercloud control plane interface:
+local_interface: em2
+
+# External private vlan on undercloud:
+external_vlan_device: em2.10
+private_external_address: 172.21.0.1
+private_external_netmask: 255.255.255.0
+
+# neutron dns:
+dns_server:
+
+# instackenv:
+instackenv_json: http://walkabout.foobar.com/cloud/instackenv.json

@@ -1,0 +1,24 @@
+---
+#
+# Reset the Undercloud machine
+#
+# Implements an extra var to prevent unintentional reseting of undercloud
+#
+# ansible-playbook -i hosts trigger-rebuild.yml -e 'reset_undercloud=true scale_host=undercloud.foobar.com'
+#
+
+- hosts: hardware_store
+  gather_facts: false
+  remote_user: root
+  vars:
+    ipmi_user: root
+    ipmi_password: password
+    reset_undercloud: false
+  tasks:
+    - name: Set undercloud to build
+      shell: hammer host update --name {{scale_host}} --build 1
+      when: reset_undercloud
+
+    - name: Power cycle undercloud host
+      shell: ipmitool -I lanplus -H mgmt-{{scale_host}} -U {{ipmi_user}} -P {{ipmi_password}}- chassis power cycle
+      when: reset_undercloud
