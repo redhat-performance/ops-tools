@@ -1,0 +1,5 @@
+# (akrzos) gnocchi api workers tuning
+parameter_defaults:
+  controllerExtraConfig:
+    gnocchi::wsgi::apache::workers: 24
+    gnocchi::wsgi::apache::threads: 1
