@@ -9,6 +9,7 @@ Tools repo for Scale/Perf DevOps Team.
   - Collection of Ansible playbooks
     * idrac - utilities for managing Dell iDRAC interfaces
     * nagios - automated, templated deployment and management of Nagios
+    * undercloud - automate installation and setup of OpenStack undercloud
 
 **lab-scheduler**
   - The QUADS (quick and dirty scheduler) system provisioning scheduler
