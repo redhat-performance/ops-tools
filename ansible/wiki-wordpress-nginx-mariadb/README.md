@@ -20,3 +20,8 @@ Then run the playbook, like this:
 
 The playbooks will configure MariaDB, WordPress, Nginx, and PHP-FPM. When the run
 is complete, you can hit access server to begin the WordPress configuration.
+
+- Note: This is forked from the Ansible examples repo with some added fixes (PR pending)
+  - https://github.com/ansible/ansible-examples/tree/master/wordpress-nginx_rhel7
+  - Changes submitted here: https://github.com/ansible/ansible-examples/pull/167
+

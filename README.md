@@ -10,6 +10,7 @@ Tools repo for Scale/Perf DevOps Team.
     * idrac - utilities for managing Dell iDRAC interfaces
     * nagios - automated, templated deployment and management of Nagios
     * undercloud - automate installation and setup of OpenStack undercloud
+    * wiki-wordpress-nginx-mariadb - deploys what it says, full wordpress stack.
 
 **lab-scheduler**
   - The QUADS (quick and dirty scheduler) system provisioning scheduler
