@@ -32,7 +32,7 @@ ansible-playbook -i hosts install/test.yml
      without the complexity of running an entire playbook.
 
 
-![testing](/ansible-sandbox/image/example.png "Common Testing Usage")
+![testing](/ansible/ansible-sandbox/image/example.png "Common Testing Usage")
 
 **Files**
 ```
