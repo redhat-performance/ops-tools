@@ -2,11 +2,9 @@ ops-tools
 =========
 Tools repo for Scale/Perf DevOps Team.
 
-**ansible-sandbox**
-  - Simple skeleton files for quickly testing Ansible code
-
 **ansible**
   - Collection of Ansible playbooks
+    * ansible-sandbox - skeleton files for quickly testing Ansible code
     * idrac - utilities for managing Dell iDRAC interfaces
     * nagios - automated, templated deployment and management of Nagios
     * undercloud - automate installation and setup of OpenStack undercloud
