@@ -1,0 +1,52 @@
+---
+# Playbook for setting up an Elastic Cluster
+#  ONLY USE BEHIND A VPN DOES NOT SECURE CLUSTER
+
+- name: Install packages
+  hosts: all
+  user: root
+  tasks:
+    - name: Install epel
+      yum: name=epel-release state=present
+
+    - name: Install OpenJDK
+      yum: name=java-1.8.0-openjdk-devel
+
+    - name: Setup Elastic repo
+      yum_repository:
+        name: elastic
+        description: repo for elasticsearch
+        baseurl: https://packages.elastic.co/elasticsearch/2.x/centos
+        gpgcheck: no
+
+    - name: Install Elastic
+      yum: name=elasticsearch state=present
+
+    - name: stop firewall
+      service: name=iptables enabled=no state=stopped
+
+- name: Template Master Nodes
+  hosts: master
+  user: root
+  vars:
+    - is_master: "true"
+    - is_data: "false"
+  tasks:
+    - name: Template elasticsearch.yml
+      template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+
+    - name: Restart Elastic
+      service: name=elasticsearch state=restarted enabled=yes
+
+- name: Template Data Nodes
+  hosts: data
+  user: root
+  vars:
+    - is_master: "false"
+    - is_data: "true"
+  tasks:
+    - name: Template elasticsearch.yml
+      template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+
+    - name: Restart Elastic
+      service: name=elasticsearch state=restarted enabled=yes
