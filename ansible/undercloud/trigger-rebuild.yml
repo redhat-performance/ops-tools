@@ -20,5 +20,5 @@
       when: reset_undercloud
 
     - name: Power cycle undercloud host
-      shell: ipmitool -I lanplus -H mgmt-{{scale_host}} -U {{ipmi_user}} -P {{ipmi_password}}- chassis power cycle
+      shell: ipmitool -I lanplus -H mgmt-{{scale_host}} -U {{ipmi_user}} -P {{ipmi_password}} chassis power cycle
       when: reset_undercloud
