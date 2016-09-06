@@ -1,0 +1,223 @@
+[DEFAULT]
+
+#
+# From instack-undercloud
+#
+
+# Local file path to the necessary images. The path should be a
+# directory readable by the current user that contains the full set of
+# images. (string value)
+#image_path = .
+
+# Fully qualified hostname (including domain) to set on the
+# Undercloud. If left unset, the current hostname will be used, but
+# the user is responsible for configuring all system hostname settings
+# appropriately.  If set, the undercloud install will configure all
+# system hostname settings. (string value)
+#undercloud_hostname = <None>
+
+# IP information for the interface on the Undercloud that will be
+# handling the PXE boots and DHCP for Overcloud instances.  The IP
+# portion of the value will be assigned to the network interface
+# defined by local_interface, with the netmask defined by the prefix
+# portion of the value. (string value)
+#local_ip = 192.0.2.1/24
+
+# Network gateway for the Neutron-managed network for Overcloud
+# instances. This should match the local_ip above when using
+# masquerading. (string value)
+#network_gateway = 192.0.2.1
+
+# Virtual IP address to use for the public endpoints of Undercloud
+# services.  Only used if undercloud_service_certficate is set.
+# (string value)
+#undercloud_public_vip = 192.0.2.2
+
+# Virtual IP address to use for the admin endpoints of Undercloud
+# services.  Only used if undercloud_service_certficate is set.
+# (string value)
+#undercloud_admin_vip = 192.0.2.3
+
+# Certificate file to use for OpenStack service SSL connections.
+# Setting this enables SSL for the OpenStack API endpoints, leaving it
+# unset disables SSL. (string value)
+#undercloud_service_certificate =
+
+# Network interface on the Undercloud that will be handling the PXE
+# boots and DHCP for Overcloud instances. (string value)
+local_interface = {{local_interface}}
+
+# Network CIDR for the Neutron-managed network for Overcloud
+# instances. This should be the subnet used for PXE booting. (string
+# value)
+#network_cidr = 192.0.2.0/24
+
+# Network that will be masqueraded for external access, if required.
+# This should be the subnet used for PXE booting. (string value)
+#masquerade_network = 192.0.2.0/24
+
+# Start of DHCP allocation range for PXE and DHCP of Overcloud
+# instances. (string value)
+#dhcp_start = 192.0.2.5
+
+# End of DHCP allocation range for PXE and DHCP of Overcloud
+# instances. (string value)
+#dhcp_end = 192.0.2.24
+
+# Network interface on which inspection dnsmasq will listen.  If in
+# doubt, use the default value. (string value)
+# Deprecated group/name - [DEFAULT]/discovery_interface
+#inspection_interface = br-ctlplane
+
+# Temporary IP range that will be given to nodes during the inspection
+# process.  Should not overlap with the range defined by dhcp_start
+# and dhcp_end, but should be in the same network. (string value)
+# Deprecated group/name - [DEFAULT]/discovery_iprange
+#inspection_iprange = 192.0.2.100,192.0.2.120
+
+# Whether to enable extra hardware collection during the inspection
+# process. Requires python-hardware or python-hardware-detect package
+# on the introspection image. (boolean value)
+#inspection_extras = true
+
+# Whether to run benchmarks when inspecting nodes. Requires
+# inspection_extras set to True. (boolean value)
+# Deprecated group/name - [DEFAULT]/discovery_runbench
+#inspection_runbench = false
+
+# Whether to support introspection of nodes that have UEFI-only
+# firmware. (boolean value)
+#inspection_enable_uefi = false
+
+# Whether to enable the debug log level for Undercloud OpenStack
+# services. (boolean value)
+#undercloud_debug = true
+
+# Whether to install Tempest in the Undercloud. (boolean value)
+#enable_tempest = true
+
+# Whether to install Mistral services in the Undercloud. (boolean
+# value)
+#enable_mistral = false
+
+# Whether to install Zaqar services in the Undercloud. (boolean value)
+#enable_zaqar = false
+
+# Whether to use iPXE for deploy by default. (boolean value)
+#ipxe_deploy = true
+
+# Whether to install Monitoring services in the Undercloud. (boolean
+# value)
+#enable_monitoring = false
+
+# Whether to store events in the Undercloud Ceilometer. (boolean
+# value)
+#store_events = false
+
+# Maximum number of attempts the scheduler will make when deploying
+# the instance. You should keep it greater or equal to the number of
+# bare metal nodes you expect to deploy at once to work around
+# potential race condition when scheduling. (integer value)
+# Minimum value: 1
+#scheduler_max_attempts = 30
+
+
+[auth]
+
+#
+# From instack-undercloud
+#
+
+# Password used for MySQL databases. If left unset, one will be
+# automatically generated. (string value)
+#undercloud_db_password = <None>
+
+# Keystone admin token. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_admin_token = <None>
+
+# Keystone admin password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_admin_password = <None>
+
+# Glance service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_glance_password = <None>
+
+# Heat db encryption key(must be 16, 24, or 32 characters. If left
+# unset, one will be automatically generated. (string value)
+#undercloud_heat_encryption_key = <None>
+
+# Heat service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_heat_password = <None>
+
+# Neutron service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_neutron_password = <None>
+
+# Nova service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_nova_password = <None>
+
+# Ironic service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_ironic_password = <None>
+
+# Aodh service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_aodh_password = <None>
+
+# Ceilometer service password. If left unset, one will be
+# automatically generated. (string value)
+#undercloud_ceilometer_password = <None>
+
+# Ceilometer metering secret. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_ceilometer_metering_secret = <None>
+
+# Ceilometer snmpd read-only user. If this value is changed from the
+# default, the new value must be passed in the overcloud environment
+# as the parameter SnmpdReadonlyUserName. This value must be between 1
+# and 32 characters long. (string value)
+#undercloud_ceilometer_snmpd_user = ro_snmp_user
+
+# Ceilometer snmpd password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_ceilometer_snmpd_password = <None>
+
+# Swift service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_swift_password = <None>
+
+# Mistral service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_mistral_password = <None>
+
+# Rabbitmq cookie. If left unset, one will be automatically generated.
+# (string value)
+#undercloud_rabbit_cookie = <None>
+
+# Rabbitmq password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_rabbit_password = <None>
+
+# Rabbitmq username. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_rabbit_username = <None>
+
+# Heat stack domain admin password. If left unset, one will be
+# automatically generated. (string value)
+#undercloud_heat_stack_domain_admin_password = <None>
+
+# Swift hash suffix. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_swift_hash_suffix = <None>
+
+# Sensu service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_sensu_password = <None>
+
+# HAProxy stats password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_haproxy_stats_password = <None>
