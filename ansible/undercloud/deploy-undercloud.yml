@@ -205,9 +205,10 @@
       when: allow_external_on_compute
 
     - name: Place version metadata json file in /home/stack
+      become: true
       template:
         src: "templates/version.json.j2"
-        dest: /home/stack/version.json
+        dest: "{{version_directory}}/version.json"
         owner: stack
         group: stack
 

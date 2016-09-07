@@ -8,6 +8,9 @@ version: 10
 rhos_release: 10-director
 build: "2016-08-29.1"
 
+# Dump version file to this directory
+version_directory: /etc
+
 # Stack user password:
 # Make a new password:
 # python -c "from passlib.hash import sha512_crypt; print sha512_crypt.encrypt('password')"
