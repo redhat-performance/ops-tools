@@ -47,13 +47,14 @@
       poll: 0
       ignore_errors: true
 
+    # 8 minute timeout
     - name: Wait for Machine Ready
       local_action:
         module: wait_for
         host: "{{inventory_hostname}}"
         port: 22
         delay: 15
-        timeout: 300
+        timeout: 480
 
     - name: Add stack user
       user: name=stack
@@ -68,7 +69,6 @@
     - name: Sudo for stack user
       shell: echo "stack ALL=(root) NOPASSWD:ALL" | tee -a /etc/sudoers.d/stack; chmod 0440 /etc/sudoers.d/stack
 
-    # Should handle exchanging ssh key for local machine to stack user
     - name: Setup authorized key upload
       authorized_key:
         user: stack
