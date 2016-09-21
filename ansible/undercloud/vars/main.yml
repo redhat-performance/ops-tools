@@ -1,12 +1,17 @@
 ---
-# All variables needed to deploy cloud07
+# All variables needed to deploy an undercloud
 
 rhos_release_rpm:
 
 # OSP/OSPd versioning and build
 version: 10
 rhos_release: 10-director
-build: "2016-08-29.1"
+build: "2016-09-20.2"
+
+deploy_additional_repos: false
+repos:
+  rhel-7-server-beta:
+    baseurl: http://walkabout.foobar.com/released/RHEL-7/7.3-Beta/Server/x86_64/os/
 
 # Dump version file to this directory
 version_directory: /etc

@@ -20,6 +20,12 @@
     - name: Disable beaker repos
       shell: rm -rf /etc/yum.repos.d/beaker-*
 
+    - name: Add custom repos
+      template:
+        src: "templates/undercloud-deploy.repo.j2"
+        dest: /etc/yum.repos.d/undercloud-deploy.repo
+      when: deploy_additional_repos
+
     - name: Get rhos-release
       get_url:
         url: "{{rhos_release_rpm}}"

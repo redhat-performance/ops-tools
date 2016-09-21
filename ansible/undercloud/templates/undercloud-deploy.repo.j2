@@ -1,0 +1,9 @@
+# Installed by undercloud-deploy Playbook
+
+{% for key in repos %}
+[{{key}}]
+name={{key}}
+baseurl={{repos[key].baseurl}}
+gpgcheck=0
+enabled=1
+{% endfor %}
