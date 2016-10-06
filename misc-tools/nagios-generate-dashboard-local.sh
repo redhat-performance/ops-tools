@@ -8,7 +8,7 @@
 tempdir=$(mktemp -d /tmp/nagiosXXXXXX)
 miscfiles=/usr/share/nagios/html
 nagioshost=localhost
-nagiospathurl='/nagios/cgi-bin/status.cgi?hosts=all'
+nagiospathurl='/nagios/cgi-bin/status.cgi?hosts=all&limit=0'
 nagiospass="YOURPASSHERE"
 localpath=/var/www/html/health/
 

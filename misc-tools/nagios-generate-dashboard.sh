@@ -5,7 +5,7 @@
 tempdir=$(mktemp -d /tmp/nagiosXXXXXX)
 miscfiles=/root/nagios
 nagioshost=host02.example.com
-nagiospathurl='/nagios/cgi-bin/status.cgi?hosts=all'
+nagiospathurl='/nagios/cgi-bin/status.cgi?hosts=all&limit=0'
 nagiospass=YOURPASSWORD
 remotehost=host01.example.com
 remotepath=/usr/share/openstack-dashboard/static/dashboard/nagios/
