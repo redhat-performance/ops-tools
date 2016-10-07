@@ -12,3 +12,7 @@ host-01
 # e.g. ipminame ansible_host=ip.address.here
 
 [servers]
+
+[elkservers]
+
+[elasticsearch]
