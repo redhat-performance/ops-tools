@@ -24,6 +24,8 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
      - generic servers *(ping, ssh, load, users, procs, uptime, disk space)*
      - webservers *(http, ping, ssh, load, users, procs, uptime, disk space)*
      - network switches *(ping, ssh)*
+     - elasticsearch (*same as server + elasticsearch)*
+     - ELK servers (*same as server + kibana + elasticsearch)*
    - ```contacts.cfg``` notification settings are in ```install/group_vars/all.yml``` and templated for easy modification.
    - Adding new hosts to inventory file will just regenerate the Nagios configs
 
