@@ -8,6 +8,10 @@ version: 10
 rhos_release: 10-director
 build: "2016-09-20.2"
 
+# RDO
+rdo_version: newton
+rdo_rc: 3
+
 deploy_additional_repos: false
 repos:
   rhel-7-server-beta:

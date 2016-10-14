@@ -1,0 +1,201 @@
+---
+#
+# Playbook deploying and setting up your undercloud for overcloud deployment in scale lab environment
+#
+# Tested against OSP10 and single-nic-vlans config setup with private external network
+#
+
+# Tasks as root
+- hosts: undercloud
+  gather_facts: true
+  vars_files:
+    - vars/main.yml
+  remote_user: root
+  tasks:
+    - name: Install sshpass
+      yum: name=sshpass
+
+    - name: Install RDO Repo
+      yum: name="https://repos.fedorapeople.org/repos/openstack/openstack-{{rdo_version}}/rdo-release-{{rdo_version}}-{{rdo_rc}}.noarch.rpm" state=present
+
+    - name: Install terminal multiplexers
+      yum: name={{item}}
+      with_items:
+        - tmux
+        - screen
+
+    - name: Update Packages
+      yum: name=* state=latest
+
+    - name: Reboot machine
+      shell: "nohup sh -c '( sleep 5 ; shutdown -r now )' &"
+      async: 0
+      poll: 0
+      ignore_errors: true
+
+    - name: Wait for Machine Ready
+      local_action:
+        module: wait_for
+        host: "{{inventory_hostname}}"
+        port: 22
+        delay: 15
+        timeout: 300
+
+    - name: Add stack user
+      user: name=stack
+
+    # Not entirely sure why the password wouldn't take with the initial command
+    - name: Stack user password
+      user:
+        name: stack
+        update_password: always
+        password: "{{stack_password}}"
+
+    - name: Sudo for stack user
+      shell: echo "stack ALL=(root) NOPASSWD:ALL" | tee -a /etc/sudoers.d/stack; chmod 0440 /etc/sudoers.d/stack
+
+    # Should handle exchanging ssh key for local machine to stack user
+    - name: Setup authorized key upload
+      authorized_key:
+        user: stack
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    - name: Setup tripleo directories
+      file:
+        path: "{{item}}"
+        state: directory
+        owner: stack
+        group: stack
+      with_items:
+        - /home/stack/images
+        - /home/stack/templates
+
+    - name: Install tripleo
+      yum: name=python-tripleoclient
+
+    - name: Fix hosts file
+      lineinfile:
+        dest: /etc/hosts
+        line: "127.0.0.1   {{ansible_fqdn}} {{ansible_hostname}} localhost localhost.localdomain localhost4 localhost4.localdomain4"
+        regexp: "127.0.0.1"
+
+    - name: Copy undercloud.conf
+      template:
+        src: "templates/undercloud.{{version}}.conf.j2"
+        dest: /home/stack/undercloud.conf
+        owner: stack
+        group: stack
+
+    - name: Deploy Private external vlan interface
+      template:
+        src: templates/ifcfg-vlan.j2
+        dest: "/etc/sysconfig/network-scripts/ifcfg-{{external_vlan_device}}"
+        owner: root
+        group: root
+
+    - name: Turn on Private external vlan interface
+      shell: ifup {{external_vlan_device}}
+
+- hosts: undercloud
+  gather_facts: false
+  vars_files:
+    - vars/main.yml
+  remote_user: stack
+  tasks:
+    - name: Install undercloud
+      shell: openstack undercloud install
+
+    - name: Install overcloud images
+      get_url:
+        url: "http://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/{{rdo_version}}/delorean/{{item}}"
+        dest: ~/images/
+      with_items:
+        - overcloud-full.tar
+        - ironic-python-agent.tar
+
+    - name: Untar ipa and overcloud images
+      command: "tar -xvf {{item}}  -C /home/stack/images"
+      with_items:
+        - "~/images/overcloud-full.tar"
+        - "~/images/ironic-python-agent.tar"
+
+    - name: Upload images
+      shell: . /home/stack/stackrc; openstack overcloud image upload --image-path /home/stack/images/
+
+    - name: Get neutron subnet uuid
+      shell: . /home/stack/stackrc; neutron subnet-list|grep start| awk '{print $2}'
+      register: neutron_subnet_uuid
+
+    - debug: msg="neutron_subnet_uuid- {{neutron_subnet_uuid}}"
+
+    - name: Setup DNS on Undercloud Neutron subnet
+      shell: ". /home/stack/stackrc; neutron subnet-update {{neutron_subnet_uuid.stdout}} --dns-nameserver {{dns_server}}"
+
+    - name: Get instackenv.json
+      get_url:
+        url: "{{instackenv_json}}"
+        dest: /home/stack/instackenv.json
+        owner: stack
+        group: stack
+
+    - name: Reset boot order
+      shell: for node in `ironic node-list | grep None | awk '{print $2}'`; do sshpass -p 100yard- ssh $(ironic $node | grep mgmt | awk '{print $3}' | awk -F\' '{print $2}') racadm set BIOS.BiosBootSettings.BootSeq NIC.Integrated.1-1-1,NIC.Integrated.1-2-1,HardDisk.List.1-1; done
+
+    - name: Shut down machines
+      shell:  for node in `ironic node-list | grep None | awk '{print $2}'`; do ironic node-set-power-state $node off; done
+
+    - name: Import instackenv.json
+      shell: . /home/stack/stackrc; openstack baremetal import --json /home/stack/instackenv.json
+
+    - name: Configure boot
+      shell: . /home/stack/stackrc; openstack baremetal configure boot
+
+    - name: Introspect Nodes
+      shell: . /home/stack/stackrc; openstack baremetal introspection bulk start
+      ignore_errors: true
+
+    - name: Remove boot_option:local from ironic nodes
+      shell: . /home/stack/stackrc; ironic node-list | grep None | awk '{print $2}' | xargs -I % ironic node-update % replace properties/capabilities='cpu_vt:true,cpu_hugepages:true,cpu_txt:true,cpu_aes:true,cpu_hugepages_1g:true'
+
+    - name: Remove boot_option:local from flavors
+      shell: ". /home/stack/stackrc; openstack flavor unset --property 'capabilities:boot_option' {{item}}"
+      with_items:
+        - baremetal
+        - compute
+        - control
+
+    - name: Copy original network configuration files
+      shell: cp -r /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans ~/templates/nic-configs
+
+    - name: Copy over static configuration files
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        owner: stack
+        group: stack
+      with_items:
+        - src: files/compute.yaml
+          dest: /home/stack/templates/nic-configs/compute.yaml
+        - src: files/controller.yaml
+          dest: /home/stack/templates/nic-configs/controller.yaml
+        - src: files/tunings.yaml
+          dest: /home/stack/tunings.yaml
+
+    - name: Copy network-environment.yaml
+      template:
+        src: "templates/network-environment.yaml.j2"
+        dest: /home/stack/templates/network-environment.yaml
+        owner: stack
+        group: stack
+
+    # (WARNING) This is more than likely a hack to allow external network addresses on compute nodes
+    - name: Fix /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml
+      become: true
+      lineinfile:
+        dest: /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml
+        line: "  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/external.yaml"
+        regexp: "  OS::TripleO::Compute::Ports::ExternalPort: ../network/ports/noop.yaml"
+        backup: true
+
+    # TODO: Fix what is causing ansible to complain of a syntax issue with this debug statement
+    # - debug: msg="You should be ready to deploy: date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml  --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 13  ;date"
