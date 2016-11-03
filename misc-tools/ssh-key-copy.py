@@ -23,7 +23,7 @@ stopword = ""
 while True:
     line = str(raw_input())
     if line.strip() == stopword:
-		break
+        break
     ssh_hosts += "%s\n" % line
 
 os.system('clear')
@@ -35,7 +35,7 @@ stopword = ""
 while True:
     line = str(raw_input())
     if line.strip() == stopword:
-		break
+        break
     ssh_keys += "%s\n" % line
 
 os.system('clear')
