@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 #-*- coding: iso-8859-15 -*-
-# simple, dirty tool to interactively copy ssh keys to hosts
+# simple tool to interactively copy additional ssh keys to hosts
+# assumes you have root credentials or key already in place
+# you should use the Ansible authorized_key module if this you want
+# to truly manage your keys properly however:
+# http://docs.ansible.com/ansible/authorized_key_module.html#examples
 
 import os
-import sys
 
 # print hosts menu
 menu = """
 ---------------------------
 |   SSH Key Copier 5000   |
 ---------------------------
-
 """
 print "%s" % (menu)
 
