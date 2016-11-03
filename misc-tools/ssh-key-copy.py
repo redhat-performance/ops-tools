@@ -2,7 +2,7 @@
 #-*- coding: iso-8859-15 -*-
 # simple tool to interactively copy additional ssh keys to hosts
 # assumes you have root credentials or key already in place
-# you should use the Ansible authorized_key module if this you want
+# you should use the Ansible authorized_key module if you want
 # to truly manage your keys properly however:
 # http://docs.ansible.com/ansible/authorized_key_module.html#examples
 
