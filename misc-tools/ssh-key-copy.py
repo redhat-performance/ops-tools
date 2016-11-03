@@ -42,8 +42,8 @@ os.system('clear')
 
 # iterate through keys, hosts and copy
 def CopyKeys():
-	for key in ssh_keys.splitlines():
-		for host in ssh_hosts.splitlines():
+    for key in ssh_keys.splitlines():
+        for host in ssh_hosts.splitlines():
             copycommand = "ssh -n root@%s 'echo %s >> ~/.ssh/authorized_keys'" % (host,key)
             print "Copying SSH Keys to %s" % (host)
             os.system(copycommand)
