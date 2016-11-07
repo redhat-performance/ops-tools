@@ -93,6 +93,12 @@
     - name: Install tripleo
       yum: name=python-tripleoclient
 
+    - name: Set hostname
+      shell: hostnamectl set-hostname {{ansible_fqdn}}
+
+    - name: Set transient hostname
+      shell: hostnamectl set-hostname --transient {{ansible_fqdn}} 
+
     - name: Fix hosts file
       lineinfile:
         dest: /etc/hosts
