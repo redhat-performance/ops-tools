@@ -3,7 +3,7 @@
 # Playbook deploying and setting up your undercloud for overcloud deployment in scale lab
 # environment or the bagl environment.
 #
-# Tested against OSP10 and single-nic-vlans config setup with private external network
+# Tested against OSP 8/9/10 and single-nic-vlans config setup with private external network
 #
 
 # Tasks as root
@@ -97,7 +97,7 @@
       shell: hostnamectl set-hostname {{ansible_fqdn}}
 
     - name: Set transient hostname
-      shell: hostnamectl set-hostname --transient {{ansible_fqdn}} 
+      shell: hostnamectl set-hostname --transient {{ansible_fqdn}}
 
     - name: Fix hosts file
       lineinfile:
@@ -118,9 +118,11 @@
         dest: "/etc/sysconfig/network-scripts/ifcfg-{{external_vlan_device}}"
         owner: root
         group: root
+      when: deploy_external_private_vlan
 
     - name: Turn on Private external vlan interface
       shell: ifup {{external_vlan_device}}
+      when: deploy_external_private_vlan
 
 - hosts: undercloud
   gather_facts: false
@@ -185,6 +187,9 @@
     - name: Copy original network configuration files
       shell: cp -r /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans ~/templates/nic-configs
 
+    - name: Copy roles_data.yaml into ~/templates
+      shell: cp /usr/share/openstack-tripleo-heat-templates/roles_data.yaml ~/templates
+
     - name: Copy over static configuration files
       copy:
         src: "{{item.src}}"
@@ -225,5 +230,7 @@
         group: stack
 
 
-    # TODO: Fix what is causing ansible to complain of a syntax issue with this debug statement
-    # - debug: msg="You should be ready to deploy: date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml  --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 13  ;date"
+    # Typical deployment
+    # date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+    # Incase you modify roles_data.yaml:
+    # date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date

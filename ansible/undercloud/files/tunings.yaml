@@ -1,5 +1,8 @@
-# (akrzos) gnocchi api workers tuning
+# Some common options I (akrzos) adjust
 parameter_defaults:
-  controllerExtraConfig:
-    gnocchi::wsgi::apache::workers: 24
-    gnocchi::wsgi::apache::threads: 1
+  #CinderLVMLoopDeviceSize: 63840
+  #CeilometerMeterDispatcher: gnocchi
+  #GnocchiBackend: file
+  #controllerExtraConfig:
+  #  gnocchi::wsgi::apache::workers: 24
+  #  gnocchi::wsgi::apache::threads: 1

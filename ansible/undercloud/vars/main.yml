@@ -29,6 +29,7 @@ stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsT
 local_interface: em2
 
 # External private vlan on undercloud:
+deploy_external_private_vlan: false
 external_vlan_device: em2.10
 private_external_address: 172.21.0.1
 private_external_netmask: 255.255.255.0
