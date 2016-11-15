@@ -1,5 +1,5 @@
 # Some common options I (akrzos) adjust
-parameter_defaults:
+#parameter_defaults:
   #CinderLVMLoopDeviceSize: 63840
   #CeilometerMeterDispatcher: gnocchi
   #GnocchiBackend: file
