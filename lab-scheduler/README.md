@@ -3,6 +3,8 @@ QUADS (quick and dirty scheduler)
 
 Automate scheduling and end-to-end provisioning of R&D scale systems.
 
+**This is moved to https://github.com/redhat-performance/quads**
+
 ![quads](/lab-scheduler/image/quads.jpg?raw=true)
 
 **What does it do?**
