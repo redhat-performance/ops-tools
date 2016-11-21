@@ -21,6 +21,7 @@ parameter_defaults:
   ExternalAllocationPools: [{'start': '172.21.0.10', 'end': '172.21.0.100'}]
   # Set to the router gateway on the external network
   ExternalInterfaceDefaultRoute: 172.21.0.1
+  PublicVirtualFixedIPs: [{'ip_address':'{{external_network_vip}}'}]
   # Gateway router for the provisioning network (or Undercloud IP)
   ControlPlaneDefaultRoute: 192.0.2.1
   # The IP address of the EC2 metadata server. Generally the IP of the Undercloud

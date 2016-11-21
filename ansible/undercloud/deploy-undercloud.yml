@@ -229,8 +229,65 @@
         owner: stack
         group: stack
 
+    - name: Create a SSL Private Key
+      shell: "openssl genrsa -out /home/stack/overcloud-privkey.pem 2048"
+      when: overcloud_ssl_endpoints
 
-    # Typical deployment
-    # date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-    # Incase you modify roles_data.yaml:
-    # date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+    - name: Create Self-Signed CA Certificate
+      shell: "openssl req -new -x509 -key /home/stack/overcloud-privkey.pem -out /home/stack/overcloud-cacert.pem -days 365 -subj '/C=US/ST=NC/L=Raleigh/O=Red Hat/OU=Performance/CN={{external_network_vip}}/subjectAltName={{external_network_vip}}'"
+      when: overcloud_ssl_endpoints
+
+    - name: Copy Self-Signed CA Certificate to trusted store
+      shell: "cp /home/stack/overcloud-cacert.pem /etc/pki/ca-trust/source/anchors/"
+      become: true
+      when: overcloud_ssl_endpoints
+
+    - name: Update the CA store
+      shell: "update-ca-trust extract"
+      become: true
+      when: overcloud_ssl_endpoints
+
+    - name: Obtain the Private Key
+      shell: "cat /home/stack/overcloud-privkey.pem"
+      register: private_key
+      when: overcloud_ssl_endpoints
+
+    - name: Obtain the CA certificate
+      shell: "cat /home/stack/overcloud-cacert.pem"
+      register: cacert
+      when: overcloud_ssl_endpoints
+
+    - name: Set ssl_private_key
+      set_fact:
+        ssl_private_key: "{{private_key.stdout | indent(4) | string}}"
+
+    - name: Set ssl_certificate
+      set_fact:
+        ssl_certificate: "{{cacert.stdout | indent(4) | string}}"
+
+    - name: Deploy enable-tls.yaml
+      template:
+        src: "templates/enable-tls.yaml.j2"
+        dest: "/home/stack/templates/enable-tls.yaml"
+
+    - name: Deploy inject-trust-anchor.yaml
+      template:
+        src: "templates/inject-trust-anchor.yaml.j2"
+        dest: "/home/stack/templates/inject-trust-anchor.yaml"
+
+    - name: Deploy cloudname.yaml
+      template:
+        src: "templates/cloudname.yaml.j2"
+        dest: "/home/stack/templates/cloudname.yaml"
+
+# Typical deployment
+# date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+
+# Modifing roles_data.yaml
+# date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+
+# SSL/TLS Public Endpoints (Typical)
+# date;time openstack overcloud deploy --templates -e ~/templates/enable-tls.yaml -e ~/templates/inject-trust-anchor.yaml -e ~/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+
+# SSL/TLS Public Endpoints (Modify roles_data.yaml)
+# date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e ~/templates/enable-tls.yaml -e ~/templates/inject-trust-anchor.yaml -e ~/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date

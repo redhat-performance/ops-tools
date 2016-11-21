@@ -28,6 +28,9 @@ stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsT
 # undercloud control plane interface:
 local_interface: em2
 
+overcloud_ssl_endpoints: false
+external_network_vip: 172.21.0.10
+
 # External private vlan on undercloud:
 deploy_external_private_vlan: false
 external_vlan_device: em2.10
