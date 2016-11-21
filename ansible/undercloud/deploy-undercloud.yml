@@ -229,12 +229,34 @@
         owner: stack
         group: stack
 
+    # Configure subjectAltNames (Incomplete as of right now)
+    # - name: Configure alt_names in openssl.cnf
+    #   become: true
+    #   ini_file:
+    #     dest: /etc/pki/tls/openssl.cnf
+    #     section: "{{item.section}}"
+    #     option: "{{item.option}}"
+    #     value: "{{item.value}}"
+    #   with_items:
+    #     - section: " v3_req "
+    #       option: "subjectAltName"
+    #       value: "@alt_names"
+    #     - section: "alt_names"
+    #       option: "IP.1"
+    #       value: "{{external_network_vip}}"
+    #     - section: "alt_names"
+    #       option: "DNS.1"
+    #       value: "{{external_network_vip}}"
+    #   when: overcloud_ssl_endpoints
+
     - name: Create a SSL Private Key
       shell: "openssl genrsa -out /home/stack/overcloud-privkey.pem 2048"
       when: overcloud_ssl_endpoints
 
     - name: Create Self-Signed CA Certificate
-      shell: "openssl req -new -x509 -key /home/stack/overcloud-privkey.pem -out /home/stack/overcloud-cacert.pem -days 365 -subj '/C=US/ST=NC/L=Raleigh/O=Red Hat/OU=Performance/CN={{external_network_vip}}/subjectAltName={{external_network_vip}}'"
+      shell: "openssl req -new -x509 -key /home/stack/overcloud-privkey.pem -out /home/stack/overcloud-cacert.pem -days 365 -subj '/C=US/ST=NC/L=Raleigh/O=Red Hat/OU=Performance/CN={{external_network_vip}}'"
+      # Use when subjectaltnames configured:
+      #shell: "openssl req -new -x509 -key /home/stack/overcloud-privkey.pem -out /home/stack/overcloud-cacert.pem -days 365 -subj '/C=US/ST=NC/L=Raleigh/O=Red Hat/OU=Performance/CN={{external_network_vip}}' -extensions v3_req"
       when: overcloud_ssl_endpoints
 
     - name: Copy Self-Signed CA Certificate to trusted store
@@ -260,25 +282,25 @@
     - name: Set ssl_private_key
       set_fact:
         ssl_private_key: "{{private_key.stdout | indent(4) | string}}"
+      when: overcloud_ssl_endpoints
 
     - name: Set ssl_certificate
       set_fact:
         ssl_certificate: "{{cacert.stdout | indent(4) | string}}"
+      when: overcloud_ssl_endpoints
 
-    - name: Deploy enable-tls.yaml
+    - name: Deploy SSL/TLS yamls
       template:
-        src: "templates/enable-tls.yaml.j2"
-        dest: "/home/stack/templates/enable-tls.yaml"
-
-    - name: Deploy inject-trust-anchor.yaml
-      template:
-        src: "templates/inject-trust-anchor.yaml.j2"
-        dest: "/home/stack/templates/inject-trust-anchor.yaml"
-
-    - name: Deploy cloudname.yaml
-      template:
-        src: "templates/cloudname.yaml.j2"
-        dest: "/home/stack/templates/cloudname.yaml"
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+      with_items:
+        - src: "templates/enable-tls.yaml.j2"
+          dest: "/home/stack/templates/enable-tls.yaml"
+        - src: "templates/inject-trust-anchor.yaml.j2"
+          dest: "/home/stack/templates/inject-trust-anchor.yaml"
+        - src: "templates/cloudname.yaml.j2"
+          dest: "/home/stack/templates/cloudname.yaml"
+      when: overcloud_ssl_endpoints
 
 # Typical deployment
 # date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --neutron-public-interface nic1 --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
