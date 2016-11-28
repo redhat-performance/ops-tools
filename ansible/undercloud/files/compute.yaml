@@ -80,9 +80,6 @@ resources:
       config:
         os_net_config:
           network_config:
-            - type: interface
-              name: em1
-              use_dhcp: true
             -
               type: ovs_bridge
               name: {get_input: bridge_name}
