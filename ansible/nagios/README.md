@@ -2,7 +2,7 @@ ansible-nagios
 ==============
 Ansible Playbook for setting up the Nagios monitoring system and clients on CentOS/RHEL.
 
-![Nagios](/image/ansible-nagios.png?raw=true)
+![Nagios](/ansbile/nagios/image/ansible-nagios.png?raw=true)
 
 ## What does it do?
    - Automated deployment of Nagios on CentOS or RHEL
@@ -94,4 +94,4 @@ systemctl restart httpd
 
    - The iDRAC health check will provide exhaustive health information and alert upon it.
 
-![iDRAC](/image/nagios-idrac.png?raw=true)
+![iDRAC](/ansible/nagios/image/nagios-idrac.png?raw=true)
