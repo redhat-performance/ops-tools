@@ -2,7 +2,7 @@ ansible-nagios
 ==============
 Ansible Playbook for setting up the Nagios monitoring system and clients on CentOS/RHEL.
 
-![Nagios](/ansbile/nagios/image/ansible-nagios.png?raw=true)
+![Nagios](/ansible/nagios/image/ansible-nagios.png?raw=true)
 
 ## What does it do?
    - Automated deployment of Nagios on CentOS or RHEL
