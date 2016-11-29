@@ -11,6 +11,7 @@ build: "2016-09-20.2"
 # RDO
 rdo_version: newton
 rdo_rc: 3
+rdo_trunk: false
 
 deploy_additional_repos: false
 repos:
