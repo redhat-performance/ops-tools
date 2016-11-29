@@ -3,16 +3,14 @@ host-01
 
 [webservers]
 
-[switches]
-# switches need two entries
-# e.g. switchname ansible_host=ip.address.here
-
-[oobservers]
-# oob servers need two entries
-# e.g. ipminame ansible_host=ip.address.here
-
-[servers]
-
 [elkservers]
 
 [elasticsearch]
+
+[switches]
+
+[oobservers]
+
+[servers]
+
+[idrac]
