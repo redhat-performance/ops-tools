@@ -17,6 +17,19 @@
 
     - name: Install RDO Repo
       yum: name="https://repos.fedorapeople.org/repos/openstack/openstack-{{rdo_version}}/rdo-release-{{rdo_version}}-{{rdo_rc}}.noarch.rpm" state=present
+      when: not rdo_trunk
+
+    - name: Install Trunk RDO Repo
+      get_url:
+          url: http://buildlogs.centos.org/centos/7/cloud/x86_64/rdo-trunk-master-tested/delorean.repo
+          dest: /etc/yum.repos.d/rdo-trunk-delorean.repo
+      when: rdo_trunk
+
+    - name: Install Trunk-depts RDO Repo
+      get_url:
+          url: https://trunk.rdoproject.org/centos7-master/delorean-deps.repo
+          dest: /etc/yum.repos.d/rdo-trunk-delorean-deps.repo
+      when: rdo_trunk
 
     - name: Install terminal multiplexers
       yum: name={{item}}
@@ -112,6 +125,16 @@
       with_items:
         - overcloud-full.tar
         - ironic-python-agent.tar
+      when: not rdo_trunk
+
+    - name: Install trunk overcloud images
+      get_url:
+        url: "http://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/master/delorean/{{item}}"
+        dest: ~/images/
+      with_items:
+        - overcloud-full.tar
+        - ironic-python-agent.tar
+      when: rdo_trunk
 
     - name: Untar ipa and overcloud images
       command: "tar -xvf {{item}}  -C /home/stack/images"
@@ -137,9 +160,6 @@
         dest: /home/stack/instackenv.json
         owner: stack
         group: stack
-
-    - name: Reset boot order
-      shell: for node in `ironic node-list | grep None | awk '{print $2}'`; do sshpass -p 100yard- ssh $(ironic $node | grep mgmt | awk '{print $3}' | awk -F\' '{print $2}') racadm set BIOS.BiosBootSettings.BootSeq NIC.Integrated.1-1-1,NIC.Integrated.1-2-1,HardDisk.List.1-1; done
 
     - name: Shut down machines
       shell:  for node in `ironic node-list | grep None | awk '{print $2}'`; do ironic node-set-power-state $node off; done
