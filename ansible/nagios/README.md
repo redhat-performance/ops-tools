@@ -19,9 +19,9 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
 ## Notes
    - Sets the ```nagiosadmin``` password to ```changeme```, you'll want to change this.
    - Creates a read-only user, set ```nagios_create_guest_user: false``` to disable this in ```install/group_vars/all.yml```
-   - Implementation is very simple, with only the following server types generated right now:
-     - out-of-band interfaces *(ping, ssh, http)*
-     - generic servers *(ping, ssh, load, users, procs, uptime, disk space)*
+   - Implementation is very simple, with the following service/resource checks generated:
+     - generic out-of-band interfaces *(ping, ssh, http)*
+     - generic Linux servers *(ping, ssh, load, users, procs, uptime, disk space)*
      - [ELK servers](https://github.com/sadsfae/ansible-elk) *(same as servers plus elasticsearch and Kibana)*
      - elasticsearch *(same as servers plus TCP/9200 for elasticsearch)*
      - webservers *(http, ping, ssh, load, users, procs, uptime, disk space)*
@@ -59,7 +59,7 @@ webserver01-ilo ansible_host=192.168.0.105
 server01
 
 [idrac]
-database01-idrac ansbile_host=192.168.0.106
+database01-idrac ansible_host=192.168.0.106
 
 ```
    - Run the playbook
