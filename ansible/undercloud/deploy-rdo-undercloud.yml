@@ -183,6 +183,9 @@
         - baremetal
         - compute
         - control
+        - ceph-storage
+        - block-storage
+        - swift-storage
 
     - name: Copy original network configuration files
       shell: cp -r /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans ~/templates/nic-configs
@@ -200,6 +203,8 @@
           dest: /home/stack/templates/nic-configs/controller.yaml
         - src: files/tunings.yaml
           dest: /home/stack/tunings.yaml
+        - src: files/scheduler-hints.yaml
+          dest: /home/stack/templates/scheduler-hints.yaml
 
     - name: Copy network-environment.yaml
       template:
