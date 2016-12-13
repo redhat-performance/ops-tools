@@ -89,6 +89,7 @@
       with_items:
         - /home/stack/images
         - /home/stack/templates
+        - /home/stack/templates/firstboot
 
     - name: Install tripleo
       yum: name=python-tripleoclient
@@ -208,11 +209,22 @@
           dest: /home/stack/tunings.yaml
         - src: files/scheduler-hints.yaml
           dest: /home/stack/templates/scheduler-hints.yaml
+        - src: files/wipe-disks.yaml
+          dest: /home/stack/templates/firstboot/wipe-disks.yaml
+        - src: files/wipe-disk.sh
+          dest: /home/stack/templates/firstboot/wipe-disk.sh
 
     - name: Copy network-environment.yaml
       template:
         src: "templates/network-environment.yaml.j2"
         dest: /home/stack/templates/network-environment.yaml
+        owner: stack
+        group: stack
+
+    - name: Copy storage-environment.yaml
+      template:
+        src: "templates/storage-environment.yaml.j2"
+        dest: /home/stack/templates/storage-environment.yaml
         owner: stack
         group: stack
 
@@ -307,20 +319,37 @@
           dest: "/home/stack/templates/cloudname.yaml"
       when: overcloud_ssl_endpoints
 
+##################################
 # Typical deployment
 # date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-# Typical deployment (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e ~/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
 
 # Modifing roles_data.yaml
 # date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
 
 # SSL/TLS Public Endpoints (Typical)
-# date;time openstack overcloud deploy --templates -e ~/templates/enable-tls.yaml -e ~/templates/inject-trust-anchor.yaml -e ~/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-# SSL/TLS Public Endpoints (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e ~/templates/scheduler-hints.yaml -e ~/templates/enable-tls.yaml -e ~/templates/inject-trust-anchor.yaml -e ~/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+# date;time openstack overcloud deploy --templates -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
 
 # SSL/TLS Public Endpoints (Modify roles_data.yaml)
-# date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e ~/templates/enable-tls.yaml -e ~/templates/inject-trust-anchor.yaml -e ~/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+# date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
+
+##################################
+# Using Scheduler-hints.yaml:
+# Set your Controllers:
+# openstack baremetal node set --property capabilities='node:controller-0' <ironic-uuid>
+# openstack baremetal node set --property capabilities='node:controller-1' <ironic-uuid>
+# openstack baremetal node set --property capabilities='node:controller-2' <ironic-uuid>
+# Set computes like above:
+# openstack baremetal node set --property capabilities='node:novacompute-0' <ironic-uuid>
+# ...
+# Set ceph-nodes (If you have any):
+# openstack baremetal node set --property capabilities='node:cephstorage-0' <ironic-uuid>
+# ...
+
+# Typical deployment (w/ scheduler-hints.yaml)
+# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --control-flavor baremetal --compute-flavor baremetal ;date
+
+# SSL/TLS Public Endpoints (w/ scheduler-hints.yaml)
+# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --control-flavor baremetal --compute-flavor baremetal ;date
+
+# With Ceph Storage (w/ scheduler-hints.yaml)
+# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/templates/storage-environment.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --ceph-storage-scale 4 --control-flavor baremetal --compute-flavor baremetal --ceph-storage-flavor baremetal ;date

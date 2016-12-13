@@ -1,0 +1,20 @@
+heat_template_version: 2014-10-16
+
+description: >
+  Wipe and convert all disks to GPT (except the disk containing the root file system)
+
+resources:
+  userdata:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: wipe_disk}
+
+  wipe_disk:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      config: {get_file: wipe-disk.sh}
+
+outputs:
+  OS::stack_id:
+    value: {get_resource: userdata}
