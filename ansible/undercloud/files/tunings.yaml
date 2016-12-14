@@ -6,3 +6,6 @@
   #controllerExtraConfig:
   #  gnocchi::wsgi::apache::workers: 24
   #  gnocchi::wsgi::apache::threads: 1
+  #  keystone::token_provider: 'fernet'
+  #  keystone::wsgi::apache::workers: 24
+  #  keystone::wsgi::apache::threads: 6

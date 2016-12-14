@@ -205,8 +205,12 @@
           dest: /home/stack/templates/nic-configs/compute.yaml
         - src: files/controller.yaml
           dest: /home/stack/templates/nic-configs/controller.yaml
+        - src: files/ceph-storage.yaml
+          dest: /home/stack/templates/nic-configs/ceph-storage.yaml
         - src: files/tunings.yaml
           dest: /home/stack/tunings.yaml
+        - src: files/ceph-pool-tune.yaml
+          dest: /home/stack/templates/ceph-pool-tune.yaml
         - src: files/scheduler-hints.yaml
           dest: /home/stack/templates/scheduler-hints.yaml
         - src: files/wipe-disks.yaml
