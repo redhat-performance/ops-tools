@@ -4,6 +4,7 @@
   #CeilometerMeterDispatcher: gnocchi
   #GnocchiBackend: file
   #controllerExtraConfig:
+  #  gnocchi::metricd::workers: 24
   #  gnocchi::wsgi::apache::workers: 24
   #  gnocchi::wsgi::apache::threads: 1
   #  keystone::token_provider: 'fernet'
