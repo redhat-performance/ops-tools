@@ -1,12 +1,27 @@
 # Some common options I (akrzos) adjust
 #parameter_defaults:
-  #CinderLVMLoopDeviceSize: 63840
+
+  # Ceilometer/Gnocchi
   #CeilometerMeterDispatcher: gnocchi
   #GnocchiBackend: file
   #controllerExtraConfig:
+  #  ceilometer::dispatcher::gnocchi::archive_policy: low
   #  gnocchi::metricd::workers: 24
   #  gnocchi::wsgi::apache::workers: 24
   #  gnocchi::wsgi::apache::threads: 1
+
+  # Cinder
+  #CinderLVMLoopDeviceSize: 63840
+
+  # Keystone
+  #controllerExtraConfig:
   #  keystone::token_provider: 'fernet'
   #  keystone::wsgi::apache::workers: 24
   #  keystone::wsgi::apache::threads: 6
+
+  # Swift
+  #SwiftRawDisks: {"sdb": {}}
+  #SwiftRawDisks: {"sdb": {}, "sdc": {}, "sdd": {}, "sde": {}, "sdf": {}, "sdg": {}, "sdh": {}, "sdi": {}, "sdj": {}}
+  #SwiftMountCheck: true
+  #SwiftUseLocalDir: false
+  #ControllerEnableSwiftStorage: false

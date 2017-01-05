@@ -207,6 +207,8 @@
           dest: /home/stack/templates/nic-configs/controller.yaml
         - src: files/ceph-storage.yaml
           dest: /home/stack/templates/nic-configs/ceph-storage.yaml
+        - src: files/swift-storage.yaml
+          dest: /home/stack/templates/nic-configs/swift-storage.yaml
         - src: files/tunings.yaml
           dest: /home/stack/tunings.yaml
         - src: files/ceph-pool-tune.yaml
@@ -345,8 +347,11 @@
 # Set computes like above:
 # openstack baremetal node set --property capabilities='node:novacompute-0' <ironic-uuid>
 # ...
-# Set ceph-nodes (If you have any):
+# Set cephstorage nodes (If you have any):
 # openstack baremetal node set --property capabilities='node:cephstorage-0' <ironic-uuid>
+# ...
+# Set objectstorage nodes (If you have any):
+# openstack baremetal node set --property capabilities='node:objectstorage-0' <ironic-uuid>
 # ...
 
 # Typical deployment (w/ scheduler-hints.yaml)
@@ -355,5 +360,9 @@
 # SSL/TLS Public Endpoints (w/ scheduler-hints.yaml)
 # date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --control-flavor baremetal --compute-flavor baremetal ;date
 
-# With Ceph Storage (w/ scheduler-hints.yaml)
+# With CephStorage (w/ scheduler-hints.yaml)
 # date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/templates/storage-environment.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --ceph-storage-scale 4 --control-flavor baremetal --compute-flavor baremetal --ceph-storage-flavor baremetal ;date
+
+# With ObjectStorage (w/ scheduler-hints.yaml)
+# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --swift-storage-scale 4 --control-flavor baremetal --compute-flavor baremetal --swift-storage-flavor baremetal ;date
+# * Edit role_data.yml to remove swift storage off controllers (Especially if the disk count does not match)
