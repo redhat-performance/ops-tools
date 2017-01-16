@@ -207,6 +207,8 @@
           dest: /home/stack/templates/nic-configs/controller.yaml
         - src: files/ceph-storage.yaml
           dest: /home/stack/templates/nic-configs/ceph-storage.yaml
+        - src: files/cinder-storage.yaml
+          dest: /home/stack/templates/nic-configs/cinder-storage.yaml
         - src: files/swift-storage.yaml
           dest: /home/stack/templates/nic-configs/swift-storage.yaml
         - src: files/tunings.yaml
