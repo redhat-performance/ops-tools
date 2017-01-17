@@ -4,6 +4,8 @@
   # Ceilometer/Gnocchi
   #CeilometerMeterDispatcher: gnocchi
   #GnocchiBackend: file
+  # Metricd Workers (Two methods, below or controllerExtraConfig)
+  #GnocchiMetricdWorkers: 24
   #controllerExtraConfig:
   #  ceilometer::dispatcher::gnocchi::archive_policy: low
   #  gnocchi::metricd::workers: 24
