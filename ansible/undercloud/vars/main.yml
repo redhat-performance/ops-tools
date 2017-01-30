@@ -1,7 +1,7 @@
 ---
 # All variables needed to deploy an undercloud
 
-rhos_release_rpm: http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+rhos_release_rpm:
 
 # OSP/OSPd versioning and build
 version: 10
@@ -47,7 +47,7 @@ private_external_netmask: 255.255.255.0
 allow_external_on_compute: false
 
 # neutron dns:
-dns_server: 10.12.64.161
+dns_server:
 
 # instackenv:
-instackenv_json: http://perf1.perf.lab.eng.bos.redhat.com/jtaleric/OpenStack/cloud01.json
+instackenv_json: http://walkabout.foobar.com/cloud/instackenv.json
