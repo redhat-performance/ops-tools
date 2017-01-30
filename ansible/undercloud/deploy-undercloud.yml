@@ -174,6 +174,7 @@
 
     - name: Introspect Nodes
       shell: . /home/stack/stackrc; openstack baremetal introspection bulk start
+      when: introspection
 
     - name: Remove boot_option:local from ironic nodes
       shell: . /home/stack/stackrc; ironic node-list | grep None | awk '{print $2}' | xargs -I % ironic node-update % replace properties/capabilities='cpu_vt:true,cpu_hugepages:true,cpu_txt:true,cpu_aes:true,cpu_hugepages_1g:true'
@@ -187,6 +188,7 @@
         - ceph-storage
         - block-storage
         - swift-storage
+      when: scale_lab_broke
 
     - name: Copy original network configuration files
       shell: cp -r /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans ~/templates/nic-configs
