@@ -178,6 +178,10 @@
 
     - name: Remove boot_option:local from ironic nodes
       shell: . /home/stack/stackrc; ironic node-list | grep None | awk '{print $2}' | xargs -I % ironic node-update % replace properties/capabilities='cpu_vt:true,cpu_hugepages:true,cpu_txt:true,cpu_aes:true,cpu_hugepages_1g:true'
+      when: scale_lab_broke
+
+    - name: Generate node-data
+      shell: . /home/stack/stackrc; mkdir ~/node-data; for i in `ironic node-list | grep avail | awk '{print $2}'`; do openstack baremetal introspection data save $i > node-data/$i; done
 
     - name: Remove boot_option:local from flavors
       shell: ". /home/stack/stackrc; openstack flavor unset --property 'capabilities:boot_option' {{item}}"
