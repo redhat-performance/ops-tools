@@ -50,3 +50,16 @@
 
     - name: Restart Elastic
       service: name=elasticsearch state=restarted enabled=yes
+      
+- name: Template Client Nodes
+  hosts: client
+  user: root
+  vars:
+    - is_master: "false"
+    - is_data: "false"
+  tasks:
+    - name: Template elasticsearch.yml
+      template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+
+    - name: Restart Elastic
+      service: name=elasticsearch state=restarted enabled=yes

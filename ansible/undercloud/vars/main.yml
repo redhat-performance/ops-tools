@@ -1,12 +1,31 @@
 ---
-# All variables needed to deploy cloud07
+# All variables needed to deploy an undercloud
 
 rhos_release_rpm:
 
 # OSP/OSPd versioning and build
 version: 10
 rhos_release: 10-director
-build: "2016-08-29.1"
+build: "ga"
+
+# RDO
+rdo_version: newton
+rdo_rc: 3
+rdo_trunk: false
+
+deploy_additional_repos: false
+repos:
+  rhel-7-server-beta:
+    baseurl: http://walkabout.foobar.com/released/RHEL-7/7.3-Beta/Server/x86_64/os/
+
+# Scale lab boot order still broke?
+scale_lab_broke: true
+
+# bulk introspection
+introspection: true
+
+# Dump version file to this directory
+version_directory: /etc
 
 # Stack user password:
 # Make a new password:
@@ -16,10 +35,16 @@ stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsT
 # undercloud control plane interface:
 local_interface: em2
 
+overcloud_ssl_endpoints: false
+external_network_vip: 172.21.0.10
+
 # External private vlan on undercloud:
+deploy_external_private_vlan: false
 external_vlan_device: em2.10
 private_external_address: 172.21.0.1
 private_external_netmask: 255.255.255.0
+# Tripleo maps external network port to noop.yml, lets keep the default behavior
+allow_external_on_compute: false
 
 # neutron dns:
 dns_server:

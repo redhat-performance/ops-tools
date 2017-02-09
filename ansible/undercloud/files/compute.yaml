@@ -33,10 +33,6 @@ parameters:
     default: ''
     description: IP address/subnet on the management network
     type: string
-  ExternalNetworkVlanID:
-    default: 10
-    description: Vlan ID for the external network traffic.
-    type: number
   InternalApiNetworkVlanID:
     default: 20
     description: Vlan ID for the internal_api network traffic.
@@ -60,9 +56,13 @@ parameters:
   ControlPlaneDefaultRoute: # Override this via parameter_defaults
     description: The default route of the control plane network.
     type: string
-  ExternalInterfaceDefaultRoute:
+  ExternalInterfaceDefaultRoute: # Not used by default in this template
     default: '10.0.0.1'
-    description: default route for the external network
+    description: The default route of the external network.
+    type: string
+  ManagementInterfaceDefaultRoute: # Commented out by default in this template
+    default: unset
+    description: The default route of the management network.
     type: string
   DnsServers: # Override this via parameter_defaults
     default: []
@@ -80,9 +80,6 @@ resources:
       config:
         os_net_config:
           network_config:
-            - type: interface
-              name: em1
-              use_dhcp: true
             -
               type: ovs_bridge
               name: {get_input: bridge_name}
@@ -110,16 +107,6 @@ resources:
                   primary: true
                 -
                   type: vlan
-                  vlan_id: {get_param: ExternalNetworkVlanID}
-                  addresses:
-                  -
-                    ip_netmask: {get_param: ExternalIpSubnet}
-                  routes:
-                    -
-                      default: true
-                      next_hop: {get_param: ExternalInterfaceDefaultRoute}
-                -
-                  type: vlan
                   vlan_id: {get_param: InternalApiNetworkVlanID}
                   addresses:
                     -
@@ -136,6 +123,19 @@ resources:
                   addresses:
                     -
                       ip_netmask: {get_param: TenantIpSubnet}
+                # Uncomment when including environments/network-management.yaml
+                # If setting default route on the Management interface, comment
+                # out the default route on the Control Plane.
+                #-
+                #  type: vlan
+                #  vlan_id: {get_param: ManagementNetworkVlanID}
+                #  addresses:
+                #    -
+                #      ip_netmask: {get_param: ManagementIpSubnet}
+                #  routes:
+                #    -
+                #      default: true
+                #      next_hop: {get_param: ManagementInterfaceDefaultRoute}
 
 outputs:
   OS::stack_id:

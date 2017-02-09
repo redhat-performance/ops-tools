@@ -2,6 +2,8 @@
 # Playbook to install nagios server and generate hosts/checks
 # This also installs NRPE on clients for more in-depth checks based on
 # Ansible inventory
+# author: Will Foster (@sadsfae)
+# https://hobo.house/2016/06/24/automate-nagios-deployment-with-ansible/
 
 - name: Check Operating System
   fail:
@@ -25,10 +27,10 @@
     - mod_ssl
     - openssl
     - openssl-libs
+    - net-snmp-utils
 
 - name: Setup nagios SSL HTTPD vhost
   copy: src=nagios.conf dest=/etc/httpd/conf.d/
-  notify: restart httpd
 
 - name: Install nagios packages and common plugins
   yum: name={{ item }} state=present
@@ -72,6 +74,12 @@
 - name: Configure nagios main configuration
   copy: src=nagios.cfg dest=/etc/nagios/nagios.cfg
 
+- name: Copy idrac check plugin
+  copy: src=idrac_2.2rc4 dest=/usr/lib64/nagios/plugins/idrac_2.2rc4 mode="a+x"
+
+- name: Configure Dell idrac snmp mib file
+  copy: src=idrac-smiv2.mib  dest={{snmp_mib_path}}/ mode=0755
+
 - name: Configure nagios localhost monitoring
   copy: src=localhost.cfg dest=/etc/nagios/objects/localhost.cfg
 
@@ -87,6 +95,9 @@
     - webservers.cfg
     - servers.cfg
     - commands.cfg
+    - elkservers.cfg
+    - elasticsearch.cfg
+    - idrac.cfg
   register: nagios_needs_restart
 
 - name: Generate the nagios contact template
@@ -128,6 +139,12 @@
           line="ExecStopPost=/usr/bin/rm -f /var/spool/nagios/cmd/nagios.cmd /var/log/nagios/rw/nagios.qh"
   register: systemd_nagios_changed
 
+# change listening port for http to match group_vars/all.yml
+- name: Set HTTP Listen Port
+  lineinfile: dest=/etc/httpd/conf/httpd.conf \
+          regexp="^Listen" \
+          line="Listen {{nagios_http_port}}"
+
 - name: Reload Systemd if needed
   command: systemctl daemon-reload
   when: systemd_nagios_changed !=0
@@ -154,7 +171,7 @@
 - name: Determine if TCP/{{nagios_http_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{nagios_http_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp80_exists
+  register: firewalld_nagios_http_port_exists
   no_log: true
 
 # add firewall rule via firewall-cmd
@@ -165,14 +182,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp80_exists.rc != 0
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_nagios_http_port_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{nagios_http_port}} (iptables-services)
   shell: grep "dport {{nagios_http_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp80_exists
-  failed_when: iptables_tcp80_exists == 127
+  register: iptables_nagios_http_port_exists
+  failed_when: iptables_nagios_http_port_exists == 127
   no_log: true
 
 - name: Add firewall rule for TCP/{{nagios_http_port}} (iptables-services)
@@ -182,7 +199,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp80_exists.stdout|int == 0
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_nagios_http_port_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{nagios_http_port}} (iptables-services)
@@ -190,23 +207,10 @@
   ignore_errors: true
   when: iptables_needs_restart != 0 and firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0
 
-# Firewalld
-- name: Determine if firewalld is in use
-  shell: systemctl is-enabled firewalld.service | egrep -qv 'masked|disabled'
-  ignore_errors: true
-  register: firewalld_in_use
-  no_log: true
-
-- name: Determine if firewalld is active
-  shell: systemctl is-active firewalld.service | grep -vq inactive
-  ignore_errors: true
-  register: firewalld_is_active
-  no_log: true
-
 - name: Determine if TCP/{{nagios_https_port}} is already active
   shell: firewall-cmd --list-ports | egrep -q "^{{nagios_https_port}}/tcp"
   ignore_errors: true
-  register: firewalld_tcp8080_exists
+  register: firewalld_nagios_https_port_exists
   no_log: true
 
 # add firewall rule via firewall-cmd
@@ -217,14 +221,14 @@
     - firewall-cmd --reload
   ignore_errors: true
   become: true
-  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_tcp8080_exists.rc != 0
+  when: firewalld_in_use.rc == 0 and firewalld_is_active.rc == 0 and firewalld_nagios_https_port_exists.rc != 0
 
 # iptables-services
 - name: check firewall rules for TCP/{{nagios_https_port}} (iptables-services)
   shell: grep "dport {{nagios_https_port}} \-j ACCEPT" /etc/sysconfig/iptables | wc -l
   ignore_errors: true
-  register: iptables_tcp443_exists
-  failed_when: iptables_tcp443_exists == 127
+  register: iptables_nagios_https_port_exists
+  failed_when: iptables_nagios_https_port_exists == 127
   no_log: true
 
 - name: Add firewall rule for TCP/{{nagios_https_port}} (iptables-services)
@@ -234,7 +238,7 @@
     regexp: '^INPUT -i lo -j ACCEPT'
     insertbefore: '-A INPUT -i lo -j ACCEPT'
     backup: yes
-  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_tcp443_exists.stdout|int == 0
+  when: firewalld_in_use.rc != 0 and firewalld_is_active.rc != 0 and iptables_nagios_https_port_exists.stdout|int == 0
   register: iptables_needs_restart
 
 - name: Restart iptables-services for TCP/{{nagios_https_port}} (iptables-services)
@@ -264,11 +268,11 @@
 
 - name: Display nagios information
   debug:
-    msg="You can access nagios at https://{{ansible_host}}/nagios using {{nagios_username}} / {{nagios_password}}"
+    msg="You can access nagios at https://{{ansible_fqdn}}/nagios using {{nagios_username}} / {{nagios_password}}"
 
 - name: Display nagios guest information
   debug:
-    msg="Guest read only users at https://{{ansible_host}}/nagios using {{nagios_ro_username}} / {{nagios_ro_password}}"
+    msg="Guest read only users at https://{{ansible_fqdn}}/nagios using {{nagios_ro_username}} / {{nagios_ro_password}}"
 
 - name: Display user password change information
   debug:

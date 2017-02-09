@@ -1,0 +1,78 @@
+## A Heat environment file which can be used to set up storage
+## backends. Defaults to Ceph used as a backend for Cinder, Glance and
+## Nova ephemeral storage.
+resource_registry:
+  OS::TripleO::NodeUserData: /home/stack/templates/firstboot/wipe-disks.yaml
+  OS::TripleO::Services::CephMon: /usr/share/openstack-tripleo-heat-templates/puppet/services/ceph-mon.yaml
+  OS::TripleO::Services::CephOSD: /usr/share/openstack-tripleo-heat-templates/puppet/services/ceph-osd.yaml
+  OS::TripleO::Services::CephClient: /usr/share/openstack-tripleo-heat-templates/puppet/services/ceph-client.yaml
+
+  #OS::TripleO::Services::CephMon: ../puppet/services/ceph-mon.yaml
+  #OS::TripleO::Services::CephOSD: ../puppet/services/ceph-osd.yaml
+  #OS::TripleO::Services::CephClient: ../puppet/services/ceph-client.yaml
+
+parameter_defaults:
+
+  #### BACKEND SELECTION ####
+
+  ## Whether to enable iscsi backend for Cinder.
+  CinderEnableIscsiBackend: false
+  ## Whether to enable rbd (Ceph) backend for Cinder.
+  CinderEnableRbdBackend: true
+  ## Cinder Backup backend can be either 'ceph' or 'swift'.
+  CinderBackupBackend: ceph
+  ## Whether to enable NFS backend for Cinder.
+  # CinderEnableNfsBackend: false
+  ## Whether to enable rbd (Ceph) backend for Nova ephemeral storage.
+  NovaEnableRbdBackend: true
+  ## Glance backend can be either 'rbd' (Ceph), 'swift' or 'file'.
+  GlanceBackend: rbd
+  ## Gnocchi backend can be either 'rbd' (Ceph), 'swift' or 'file'.
+  GnocchiBackend: rbd
+
+  #### CINDER NFS SETTINGS ####
+
+  ## NFS mount options
+  # CinderNfsMountOptions: ''
+  ## NFS mount point, e.g. '192.168.122.1:/export/cinder'
+  # CinderNfsServers: ''
+
+
+  #### GLANCE NFS SETTINGS ####
+
+  ## Make sure to set `GlanceBackend: file` when enabling NFS
+  ##
+  ## Whether to make Glance 'file' backend a NFS mount
+  # GlanceNfsEnabled: false
+  ## NFS share for image storage, e.g. '192.168.122.1:/export/glance'
+  ## (If using IPv6, use both double- and single-quotes,
+  ## e.g. "'[fdd0::1]:/export/glance'")
+  # GlanceNfsShare: ''
+  ## Mount options for the NFS image storage mount point
+  # GlanceNfsOptions: 'intr,context=system_u:object_r:glance_var_lib_t:s0'
+
+
+  #### CEPH SETTINGS ####
+
+  ## When deploying Ceph Nodes through the oscplugin CLI, the following
+  ## parameters are set automatically by the CLI. When deploying via
+  ## heat stack-create or ceph on the controller nodes only,
+  ## they need to be provided manually.
+
+  ## Number of Ceph storage nodes to deploy
+  # CephStorageCount: 0
+  ## Ceph FSID, e.g. '4b5c8c0a-ff60-454b-a1b4-9747aa737d19'
+  # CephClusterFSID: ''
+  ## Ceph monitor key, e.g. 'AQC+Ox1VmEr3BxAALZejqeHj50Nj6wJDvs96OQ=='
+  # CephMonKey: ''
+  ## Ceph admin key, e.g. 'AQDLOh1VgEp6FRAAFzT7Zw+Y9V6JJExQAsRnRQ=='
+  # CephAdminKey: ''
+  ## Ceph client key, e.g 'AQC+vYNXgDAgAhAAc8UoYt+OTz5uhV7ItLdwUw=='
+  # CephClientKey: ''
+
+  # Set if you have more OSDs:
+  ExtraConfig:
+    ceph::profile::params::osds:
+      '/dev/sdb':
+        journal: '/dev/sdb'
+      '/dev/sdc': {}

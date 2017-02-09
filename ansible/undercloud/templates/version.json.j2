@@ -1,0 +1,9 @@
+{# Determine the OSP Series name via a dictionary on $version #}
+{% set osp_series = {7: "kilo", 8: "liberty", 9: "mitaka", 10: "newton", 11: "ocata", 12: "pike"}[version] | default("Unknown Version") -%}
+{
+    "osp_series": "{{osp_series}}",
+    "osp_version": "{{version}}",
+    "rhos_release": "{{rhos_release}}",
+    "build": "{{build}}",
+    "uc_build_date": "{{lookup('pipe','date +%Y%m%d-%H%M%S')}}"
+}

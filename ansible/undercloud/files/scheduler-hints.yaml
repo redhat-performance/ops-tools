@@ -1,0 +1,11 @@
+parameter_defaults:
+  ControllerSchedulerHints:
+    'capabilities:node': 'controller-%index%'
+  NovaComputeSchedulerHints:
+    'capabilities:node': 'novacompute-%index%'
+  BlockStorageSchedulerHints:
+    'capabilities:node': 'blockstorage-%index%'
+  ObjectStorageSchedulerHints:
+    'capabilities:node': 'objectstorage-%index%'
+  CephStorageSchedulerHints:
+    'capabilities:node': 'cephstorage-%index%'

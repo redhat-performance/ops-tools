@@ -1,5 +1,30 @@
-# (akrzos) gnocchi api workers tuning
-parameter_defaults:
-  controllerExtraConfig:
-    gnocchi::wsgi::apache::workers: 24
-    gnocchi::wsgi::apache::threads: 1
+# Some common options I (akrzos) adjust
+#parameter_defaults:
+
+  # Ceilometer/Gnocchi
+  #CeilometerMeterDispatcher: gnocchi
+  #GnocchiBackend: file
+  # Metricd Workers (Two methods, below or controllerExtraConfig)
+  #GnocchiMetricdWorkers: 24
+  #controllerExtraConfig:
+  #  ceilometer::dispatcher::gnocchi::archive_policy: low
+  #  gnocchi::metricd::workers: 24
+  #  gnocchi::wsgi::apache::workers: 24
+  #  gnocchi::wsgi::apache::threads: 1
+
+  # Cinder
+  #CinderLVMLoopDeviceSize: 63840
+
+  # Keystone
+  #controllerExtraConfig:
+  #  keystone::token_provider: 'fernet'
+  #  keystone::wsgi::apache::workers: 24
+  #  keystone::wsgi::apache::threads: 6
+
+  # Swift
+  #SwiftWorkers: 24
+  #SwiftRawDisks: {"sdb": {}}
+  #SwiftRawDisks: {"sdb": {}, "sdc": {}, "sdd": {}, "sde": {}, "sdf": {}, "sdg": {}, "sdh": {}, "sdi": {}, "sdj": {}}
+  #SwiftMountCheck: true
+  #SwiftUseLocalDir: false
+  #ControllerEnableSwiftStorage: false
