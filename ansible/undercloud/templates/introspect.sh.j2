@@ -23,7 +23,7 @@ openstack baremetal introspection bulk start
 
 {% endif %}
 
-{% if step_introspect_with_retry|bool %}
+{% if introspect_with_retry|bool %}
 
 ## * Introspect all manageable nodes with a caller provided timeout.
 ##   then move all nodes that power off after a successful introspection
