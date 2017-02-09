@@ -170,9 +170,13 @@
     - name: Configure boot
       shell: . /home/stack/stackrc; openstack baremetal configure boot
 
-    - name: Introspect Nodes
-      shell: . /home/stack/stackrc; openstack baremetal introspection bulk start
-      ignore_errors: true
+    - name: Template introspection script
+      template:
+        src: "introspect.sh.j2"
+        dest: "{{ lookup('env', 'HOME') }}/introspect.sh"
+
+    - name: Run introspection script
+      shell: "bash {{ lookup('env', 'HOME') }}/introspect.sh"
 
     - name: Remove boot_option:local from ironic nodes
       shell: . /home/stack/stackrc; ironic node-list | grep None | awk '{print $2}' | xargs -I % ironic node-update % replace properties/capabilities='cpu_vt:true,cpu_hugepages:true,cpu_txt:true,cpu_aes:true,cpu_hugepages_1g:true'
