@@ -24,6 +24,9 @@ scale_lab_broke: true
 # bulk introspection
 introspection: true
 
+# better introspection
+introspect_with_retry: false
+
 # Dump version file to this directory
 version_directory: /etc
 

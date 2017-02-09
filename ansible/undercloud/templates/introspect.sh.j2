@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -eux
+
+### --start_docs
+## Prepare images for deploying the overcloud
+## ==========================================
+
+## Prepare Your Environment
+## ------------------------
+
+## * Source in the undercloud credentials.
+## ::
+
+source {{ working_dir }}/stackrc
+
+{% if introspection %}
+
+## * Introspect hardware attributes of nodes.
+## ::
+
+openstack baremetal introspection bulk start
+
+{% endif %}
+
+{% if step_introspect_with_retry|bool %}
+
+## * Introspect all manageable nodes with a caller provided timeout.
+##   then move all nodes that power off after a successful introspection
+##   back to available so we don't introspect them again. This is useful
+##   for large deployments (think 10+ nodes) where bulk introspection
+##   can be troublesome. It's also useful in environments where connection
+##   problems may spuriously fail a deployment. Related-Bug: #1651127
+## ::
+introspect()
+{
+  for node in `ironic --json node-list | jq -r '.[]| select(.["provision_state"] == "manageable")| .["uuid"]'`; do
+    openstack baremetal introspection start $node
+    sleep 30s
+  done
+
+  set +e
+  timeout $1 bash -c -- 'source $HOME/stackrc; \
+                         node_count=$(ironic --json node-list|jq -r ".| length") ; \
+                         on_count=$(ironic --json node-list|jq -r ".[]| select(.[\"power_state\"] == \"power on\")| .[\"uuid\"]" | wc -l) ; \
+                         while [ $node_count != $on_count ] && [ $on_count -gt 0 ]; do \
+                            sleep 30s; \
+                            node_count=$(ironic --json node-list|jq -r ".| length") ; \
+                            on_count=$(ironic --json node-list|jq -r ".[]| select(.[\"power_state\"] == \"power on\")| .[\"uuid\"]" | wc -l) ; \
+                         done'
+  set -e
+
+  for node in `ironic --json node-list | jq -r '.[]| select(.["power_state"] == "power off")| select(.["provision_state"] == "manageable")|.["uuid"]'`; do
+    ironic node-set-provision-state $node provide
+  done
+}
+
+## * Introspect hardware attributes of nodes in a robust manner
+##   retrying up to three times on any given node. This should
+##   only be used in cases where deployment using bulk introspection
+##   has reliability issues.
+## ::
+
+for node in `ironic --json node-list | jq -r '.[]| select(.["provision_state"] == "available")| .["uuid"]'`; do
+  ironic node-set-provision-state $node manage
+done
+
+introspect 15m
+introspect 30m
+introspect 60m
+
+{% endif %}
+
+### --stop_docs
