@@ -12,7 +12,7 @@ set -eux
 ## * Source in the undercloud credentials.
 ## ::
 
-source {{ working_dir }}/stackrc
+source {{ ansible_env.HOME }}/stackrc
 
 {% if introspection %}
 
