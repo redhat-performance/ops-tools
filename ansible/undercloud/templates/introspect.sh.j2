@@ -12,9 +12,9 @@ set -eux
 ## * Source in the undercloud credentials.
 ## ::
 
-source {{ ansible_env.HOME }}/stackrc
+source /home/stack/stackrc
 
-{% if introspection %}
+{% if introspection|bool %}
 
 ## * Introspect hardware attributes of nodes.
 ## ::

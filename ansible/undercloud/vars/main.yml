@@ -24,7 +24,7 @@ scale_lab_broke: true
 # bulk introspection
 introspection: true
 
-# better introspection
+# better introspection, be sure to turn bulk off if you use this
 introspect_with_retry: false
 
 # Dump version file to this directory
