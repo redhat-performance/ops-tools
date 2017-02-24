@@ -34,25 +34,31 @@ openstack baremetal introspection bulk start
 ## ::
 introspect()
 {
-  for node in `ironic --json node-list | jq -r '.[]| select(.["provision_state"] == "manageable")| .["uuid"]'`; do
-    openstack baremetal introspection start $node
-    sleep 30s
-  done
+    for node in `ironic --json node-list | jq -r '.[]| select(.["provision_state"] == "manageable")| .["uuid"]'`; do
+        openstack baremetal introspection start $node
+        sleep 30s
+    done
 
-  set +e
-  timeout $1 bash -c -- 'source $HOME/stackrc; \
-                         node_count=$(ironic --json node-list|jq -r ".| length") ; \
-                         on_count=$(ironic --json node-list|jq -r ".[]| select(.[\"power_state\"] == \"power on\")| .[\"uuid\"]" | wc -l) ; \
-                         while [ $node_count != $on_count ] && [ $on_count -gt 0 ]; do \
-                            sleep 30s; \
-                            node_count=$(ironic --json node-list|jq -r ".| length") ; \
+    manageable_count=$(ironic --json node-list | jq -r '.[]| select(.["provision_state"] == "manageable")| .["uuid"]' | wc -l)
+    on_count=$(ironic --json node-list|jq -r '.[]| select(.["power_state"] == "power on")| .["uuid"]' | wc -l)
+    while [ $on_count -eq 0 ] && [ $manageable_count -gt 0 ]; do
+        manageable_count=$(ironic --json node-list | jq -r '.[]| select(.["provision_state"] == "manageable")| .["uuid"]' | wc -l)
+        on_count=$(ironic --json node-list|jq -r '.[]| select(.[\"power_state\"] == \"power on\")| .[\"uuid\"]' | wc -l)
+        sleep 30
+    done
+
+    set +e
+    timeout $1 bash -c -- 'source $HOME/stackrc; \
                             on_count=$(ironic --json node-list|jq -r ".[]| select(.[\"power_state\"] == \"power on\")| .[\"uuid\"]" | wc -l) ; \
-                         done'
-  set -e
+                            while [ $on_count -gt 0 ]; do \
+                                sleep 30s; \
+                                on_count=$(ironic --json node-list|jq -r ".[]| select(.[\"power_state\"] == \"power on\")| .[\"uuid\"]" | wc -l) ; \
+                            done'
+    set -e
 
-  for node in `ironic --json node-list | jq -r '.[]| select(.["power_state"] == "power off")| select(.["provision_state"] == "manageable")|.["uuid"]'`; do
-    ironic node-set-provision-state $node provide
-  done
+    for node in `ironic --json node-list | jq -r '.[]| select(.["power_state"] == "power off")| select(.["provision_state"] == "manageable")|.["uuid"]'`; do
+        ironic node-set-provision-state $node provide
+    done
 }
 
 ## * Introspect hardware attributes of nodes in a robust manner
