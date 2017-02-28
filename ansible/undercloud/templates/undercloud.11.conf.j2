@@ -84,7 +84,7 @@ local_interface = {{local_interface}}
 
 # Start of DHCP allocation range for PXE and DHCP of Overcloud
 # instances. (string value)
-dhcp_start = 192.168.24.5
+dhcp_start = 192.168.24.51
 
 # End of DHCP allocation range for PXE and DHCP of Overcloud
 # instances. (string value)
@@ -112,7 +112,7 @@ dhcp_end = 192.168.24.250
 # process.  Should not overlap with the range defined by dhcp_start
 # and dhcp_end, but should be in the same network. (string value)
 # Deprecated group/name - [DEFAULT]/discovery_iprange
-#inspection_iprange = 192.168.24.100,192.168.24.120
+inspection_iprange = 192.168.24.5,192.168.24.50
 
 # Whether to enable extra hardware collection during the inspection
 # process. Requires python-hardware or python-hardware-detect package
