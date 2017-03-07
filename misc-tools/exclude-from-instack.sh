@@ -1,9 +1,10 @@
 #!/usr/bin/bash
 # wrapper to hammer some common hammer commands
 # This lets you:
-# set boostate for director
-# remove boostate for director
+# set bootstate for director
+# remove bootstate for director
 # list machines included or excluded in the instackenv.json
+# Requires: hammer cli
 
 function usage() {
     echo "USAGE:   `dirname $0`/`basename $0` -e <true|false> -h \$HOSTNAME -c <cloudname> -u foremanuser -p foremanpassword"
@@ -32,7 +33,6 @@ function set_bootstate() {
 	echo hammer -u $user -p $password host set-parameter --host $target --name nullos --value $nullos
 
 }
-
 
 args=`getopt -o l:u:p:e:c:h: -l excluded-hosts:,list:,user:,password:,exclude:,cloud:,host:,help -- "$@"`
 
@@ -103,6 +103,10 @@ while true ; do
 done
 
 foreman_hostname=$host_name
+# This is a host parameter we set to decide whether
+# a machine is included in an OpenStack Director deployed
+# Overcloud.  See:
+# https://github.com/redhat-performance/quads/blob/84e678086d32c72ce52104d4b1d0f2150469cf80/bin/make-instackenv-json.sh#L39
 nullos_variable=$exclude
 
 if [ -z "$cloudname" -a -z "$list_cloud" ]; then
@@ -133,6 +137,5 @@ if [ -z "$foreman_hostname" ]; then
     usage ; echo "Terminating..." >&2
     exit 1
 fi
-
 
 set_bootstate $foreman_hostname $nullos_variable $user $password
