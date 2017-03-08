@@ -1,10 +1,6 @@
 #!/usr/bin/bash
-# wrapper to hammer some common hammer commands
-# This lets you:
-# set bootstate for director
-# remove bootstate for director
-# list machines included or excluded in the instackenv.json
-# Requires: hammer cli
+# wrapper for setting QUADS host parameter that enables
+# or disables participation in an overcloud.
 
 function usage() {
     echo "USAGE:   `dirname $0`/`basename $0` -e <true|false> -h \$HOSTNAME -c <cloudname> -u foremanuser -p foremanpassword"
@@ -22,6 +18,7 @@ function list_cloud_includes() {
 	password=$3
 	selection=$4
 
+	echo hammer -u $user -p $password host list --search params.nullos=$selection | grep example.com | awk '{ print $3 }'
 	hammer -u $user -p $password host list --search params.nullos=$selection | grep example.com | awk '{ print $3 }'
 }
 
@@ -30,10 +27,37 @@ function set_bootstate() {
 	nullos=$2
 	user=$3
 	password=$4
-	echo hammer -u $user -p $password host set-parameter --host $target --name nullos --value $nullos
+	echo hammer host set-parameter --host $target --name nullos --value $nullos
+	hammer host set-parameter --host $target --name nullos --value $nullos
 
 }
 
+
+function clean_interfaces() {
+	tmpfile=$(mktemp /tmp/foremanXXXXXX)
+	problemhost=$1
+	skip_id=$(hammer host info --name $problemhost | grep -B 3 "nterface (primary, provision" | grep Id: | awk '{ print $NF }')
+	hammer host info --name $problemhost > $tmpfile
+	for interface in $(grep Id $tmpfile  | grep ')' | grep -v $skip_id | awk '{ print $NF }') ; do \
+	hammer host interface delete --host $problemhost --id $interface \
+	;done
+	rm -f $tmpfile
+
+}
+
+function check_access() {
+	hostname=$1
+	user=$2
+	pass=$3
+
+	result=$(hammer -u $user -p $pass host list  | grep $hostname)
+	if [ -z "$result" ]; then
+		echo "You do not appear to have access to $hostname"
+		exit 1
+	fi
+}
+
+	
 args=`getopt -o l:u:p:e:c:h: -l excluded-hosts:,list:,user:,password:,exclude:,cloud:,host:,help -- "$@"`
 
 if [ $? != 0 ] ; then usage ; echo "Terminating..." >&2 ; exit 1 ; fi
@@ -103,11 +127,6 @@ while true ; do
 done
 
 foreman_hostname=$host_name
-# This is a host parameter we set to decide whether
-# a machine is included in an OpenStack Director deployed
-# Overcloud.  See:
-# https://github.com/redhat-performance/quads/blob/84e678086d32c72ce52104d4b1d0f2150469cf80/bin/make-instackenv-json.sh#L39
-nullos_variable=$exclude
 
 if [ -z "$cloudname" -a -z "$list_cloud" ]; then
     usage ; echo "Terminating..." >&2
@@ -124,9 +143,13 @@ if [ "$list_cloud" ]; then
     exit 0
 fi
 
-case $nullos_variable in
-'true'|'false')
-    ;;
+case $exclude in
+'true')
+	nullos_variable=false
+	;;
+'false')
+	nullos_variable=true
+	;;
 *)
     usage ; echo "Terminating..." >&2
     exit 1
@@ -138,4 +161,8 @@ if [ -z "$foreman_hostname" ]; then
     exit 1
 fi
 
+check_access $foreman_hostname $user $password
+
+# first clean any extraneous interfaces that have been collected
+clean_interfaces $foreman_hostname
 set_bootstate $foreman_hostname $nullos_variable $user $password
