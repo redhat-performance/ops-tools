@@ -1,0 +1,175 @@
+---
+- gather_facts: False
+  name: check for racadm
+  vars:
+    untouchables: mgmt-foreman.rdu.openstack.engineering.example.com
+  hosts: all:!{{untouchables}}
+  tasks:
+
+# Delete the jobqueue to we can search it reliably later
+    - name: racadm jobqueue delete
+      raw: racadm jobqueue delete --all
+      args:
+        executable: ''
+      register: result_jobqueue
+    - debug: var=result_jobqueue
+
+# Ensure we are starting with a powered down system
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+# Wipe raid controller
+    - name: racadm resetcfg
+      raw: racadm raid resetconfig:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_resetcfg
+    - debug: var=result_resetcfg
+
+# Commit the changes to the raid controller
+    - name: racadm raid reconfigure powercycle
+      raw: racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW  -r pwrcycle
+      args:
+        executable: ''
+      register: result_pwrcycle
+    - debug: var=result_pwrcycle
+
+# Now wait for the jobqueue to finish
+    - name: racadm check complete
+      raw: racadm jobqueue view
+      args:
+        executable: ''
+      register: result_check_complete
+      until: result_check_complete.stdout.find("Status=Completed") != -1 and result_check_complete.stdout.find("Status=Running") == -1
+      retries: 2000
+      delay: 10
+    - debug: var=result_check_complete
+
+# Turn off the server
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+# Delete the jobqueue to we can search it reliably later
+    - name: racadm jobqueue delete
+      raw: racadm jobqueue delete --all
+      args:
+        executable: ''
+      register: result_jobqueue
+    - debug: var=result_jobqueue
+
+# setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.0:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.1:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.2:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.3:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.4:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.5:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.6:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.7:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.8:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+## setup JBOD - vdisk R0
+    - name: racadm setup vdisk
+      raw: racadm raid createvd:RAID.Integrated.1-1 -rl r0 -pdkey:Disk.Bay.9:Enclosure.Internal.0-1:RAID.Integrated.1-1
+      args:
+        executable: ''
+      register: result_vdisk_setup
+    - debug: var=result_vdisk_setup
+
+# Commit the changes to the raid controller
+    - name: racadm raid reconfigure powercycle
+      raw: racadm jobqueue create RAID.Integrated.1-1 -s TIME_NOW  -r pwrcycle
+      args:
+        executable: ''
+      register: result_pwrcycle
+    - debug: var=result_pwrcycle
+
+# Now wait for the jobqueue to finish
+    - name: racadm check complete
+      raw: racadm jobqueue view
+      args:
+        executable: ''
+      register: result_check_complete
+      until: result_check_complete.stdout.find("Status=Completed") != -1 and result_check_complete.stdout.find("Status=Running") == -1
+      retries: 2000
+      delay: 10
+    - debug: var=result_check_complete
+
+# Turn off the server
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+
