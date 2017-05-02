@@ -6,10 +6,11 @@
 PROJECTDIR=/home/quads/git/quads
 LISTING_STATEDIR=/home/quads/review
 LOCK=/home/quads/.quads.cron.lock
+COMMITURL="https://github.com/redhat-performance/quads/commit"
 
 cd $PROJECTDIR
 
-# note that prior to proceeding, an account was 
+# note that prior to proceeding, an account was
 # manually created and verified on github and
 # authorized on the gerrit server.
 
@@ -50,7 +51,7 @@ git checkout master
 for review in $(cd /home/quads/review ; ls ) ; do
   if [ "$(git log --pretty=oneline | grep "$(cat /home/quads/review/$review)")" ]; then
     msg="$(cat /home/quads/review/$review)"
-    echo "#quads Review Merged :: https://review.gerrithub.io/#/c/$id/  || branch: $branch || https://github.com/redhat-performance/quads/commit/$msg" | nc 127.0.0.1 5556
+    echo "#quads Review Merged :: https://review.gerrithub.io/#/c/$id/  || branch: $branch || $COMMITURL/$msg" | nc 127.0.0.1 5556
     rm -f /home/quads/review/$review
   fi
 done
