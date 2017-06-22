@@ -3,7 +3,7 @@
 
 ### Nagios Variables ###
 nagios_username: nagiosadmin
-nagios_password: changeme
+nagios_password: bb8391fe27
 nagios_create_guest_user: true
 nagios_ro_username: guest
 nagios_ro_password: guest
@@ -11,12 +11,12 @@ nagios_http_port: 80
 nagios_https_port: 443
 admin_name_01: nagiosadmin
 # change this to your email address if you want notifications
-admin_email_01: nagios@localhost
+admin_email_01: openstack-lab-alerts@redhat.com
 ### NRPE variables ###
 nrpe_tcp_port: 5666
 # threshold for # of processes
-warning_proc: 900
-critical_proc: 1000
+warning_proc: 1900
+critical_proc: 2500
 # threshold for # of logged in users
 warning_users: 15
 critical_users: 30
@@ -37,9 +37,9 @@ idrac_ps: true
 # system fans and speed
 idrac_fan: true
 # CMOS battery
-idrac_battery: true
+idrac_battery: false
 # power redundancy
-idrac_pu: true
+idrac_pu: false
 # system memory
 idrac_mem: true
 # physical disk/RAID
@@ -47,6 +47,6 @@ idrac_disk: true
 # RAID vdisk or JBOD
 idrac_vdisk: true
 # temperature
-idrac_sensor: true
+idrac_sensor: false
 # system cpu
 idrac_cpu: true

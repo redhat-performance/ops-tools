@@ -2,7 +2,7 @@ ansible-nagios
 ==============
 Ansible Playbook for setting up the Nagios monitoring system and clients on CentOS/RHEL.
 
-![Nagios](/ansible/nagios/image/ansible-nagios.png?raw=true)
+![Nagios](/image/ansible-nagios.png?raw=true)
 
 ## What does it do?
    - Automated deployment of Nagios on CentOS or RHEL
@@ -12,6 +12,7 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
      * Generates most of the other configs based on jinja2 templates
      * Wraps Nagios in SSL via Apache
      * Sets up proper firewall rules (firewalld or iptables-services)
+     * This is also available via [Ansible Galaxy](https://galaxy.ansible.com/sadsfae/ansible-nagios/)
 
 ## Requirements
    - RHEL7 or CentOS7+ for Nagios server.
@@ -19,14 +20,14 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
 ## Notes
    - Sets the ```nagiosadmin``` password to ```changeme```, you'll want to change this.
    - Creates a read-only user, set ```nagios_create_guest_user: false``` to disable this in ```install/group_vars/all.yml```
-   - Implementation is very simple, with the following service/resource checks generated:
+   - Implementation is very simple, with the following resource/service checks generated:
      - generic out-of-band interfaces *(ping, ssh, http)*
      - generic Linux servers *(ping, ssh, load, users, procs, uptime, disk space)*
      - [ELK servers](https://github.com/sadsfae/ansible-elk) *(same as servers plus elasticsearch and Kibana)*
      - elasticsearch *(same as servers plus TCP/9200 for elasticsearch)*
      - webservers *(http, ping, ssh, load, users, procs, uptime, disk space)*
      - network switches *(ping, ssh)*
-     - Dell iDRAC checks via SNMP and Dell MiB files:
+     - Dell iDRAC server checks via @dangmocrang [check_idrac](https://github.com/dangmocrang/check_idrac)
        - You can select which checks you want in ```install/group_vars/all.yml```
          - CPU, DISK, VDISK, PS, POWER, TEMP, MEM, FAN
    - ```contacts.cfg``` notification settings are in ```install/group_vars/all.yml``` and templated for easy modification.
@@ -35,8 +36,8 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
 ## Nagios Server Instructions
    - Clone repo and setup your Ansible inventory (hosts) file
 ```
-git clone https://github.com/redhat-performance/ops-tools
-cd ansible/nagios
+git clone https://github.com/sadsfae/ansible-nagios
+cd ansible-nagios
 sed -i 's/host-01/yournagioshost/' hosts
 ```
    - Add any hosts for checks in the ```hosts``` inventory
@@ -94,11 +95,11 @@ systemctl restart httpd
 ## iDRAC Server Health Details
    - The iDRAC health checks are all optional, you can pick which ones you want to monitor.
 
-![CHECK](/ansible/nagios/image/idrac-check.jpg?raw=true)
+![CHECK](/image/idrac-check.jpg?raw=true)
 
    - The iDRAC health check will provide exhaustive health information and alert upon it.
 
-![iDRAC](/ansible/nagios/image/nagios-idrac.png?raw=true)
+![iDRAC](/image/nagios-idrac.png?raw=true)
 
 ## Files
 

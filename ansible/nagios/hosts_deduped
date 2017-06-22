@@ -6,7 +6,6 @@ foreman.rdu.openstack.engineering.redhat.com
 wiki.rdu.openstack.engineering.redhat.com
 rhev-foreman.rdu.openstack.engineering.redhat.com
 scalelab.redhat.com
-
 [servers]
 creepyhands.rdu.openstack.engineering.redhat.com
 c08-h30-r630.rdu.openstack.engineering.redhat.com
@@ -14,19 +13,16 @@ c08-h05-r930.rdu.openstack.engineering.redhat.com
 walkabout.rdu.openstack.engineering.redhat.com ansible_connection=local
 hobohouse.rdu.openstack.engineering.redhat.com
 hwstore.rdu.openstack.engineering.redhat.com
-
 [elasticsearch]
 es-data01.rdu.openstack.engineering.redhat.com
 es-data02.rdu.openstack.engineering.redhat.com
 es-master01.rdu.openstack.engineering.redhat.com
 es-master02.rdu.openstack.engineering.redhat.com
 es-master03.rdu.openstack.engineering.redhat.com
-
 [elkservers]
-#elk.browbeatproject.org ansible_host=46.231.133.57
+elk.browbeatproject.org ansible_host=46.231.133.57
 kibana.rdu.openstack.engineering.redhat.com
 bullwinkle.rdu.openstack.engineering.redhat.com
-
 [switches]
 b09-mgmt-pc5548 ansible_host=10.12.64.26
 b10-mgmt-pc5548 ansible_host=10.12.64.23
@@ -46,10 +42,8 @@ b10-tor-sw-5200 ansible_host=10.12.67.239
 b09-tor-sw-5200 ansible_host=10.12.67.238
 c10-dist-sw-5200 ansible_host=10.12.252.242
 c09-dist-sw-5200 ansible_host=10.12.252.241
-
 [idrac]
-mgmt-foreman.rhev.openstack.engineering.redhat.com ansible_host=10.12.69.233
-mgmt-b07-h02-zfs01.rdu.openstack.engineering.redhat.com ansible_host=10.12.67.2
+b07-h02-zfs01.rdu.openstack.engineering.redhat.com ansible_host=10.12.66.226
 mgmt-b09-h01-r620.rdu.openstack.engineering.redhat.com ansible_host=10.12.66.193
 mgmt-b09-h02-r620.rdu.openstack.engineering.redhat.com ansible_host=10.12.66.195
 mgmt-b09-h03-r620.rdu.openstack.engineering.redhat.com ansible_host=10.12.66.197
@@ -217,9 +211,7 @@ mgmt-c10-h31-r630.rdu.openstack.engineering.redhat.com ansible_host=10.12.64.19
 mgmt-c10-h32-r630.rdu.openstack.engineering.redhat.com ansible_host=10.12.64.20
 mgmt-c10-h33-r630.rdu.openstack.engineering.redhat.com ansible_host=10.12.64.22
 mgmt-foreman.rdu.openstack.engineering.redhat.com ansible_host=10.12.64.129
-
 [oobservers]
-# not really an oob server but we want to check http, ssh, ping
 mgmt-c04-h01-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.148
 mgmt-c04-h05-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.146
 mgmt-c04-h09-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.144
@@ -280,7 +272,6 @@ mgmt-c06-h13-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.10
 mgmt-c06-h17-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.12
 mgmt-c06-h21-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.14
 mgmt-c06-h25-6048r.rdu.openstack.engineering.redhat.com ansible_host=10.12.65.16
-
 [sshkeys]
 hobohouse.openstack.engineering.redhat.com
 # add all hosts here that need keys deployed
