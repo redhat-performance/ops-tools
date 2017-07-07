@@ -4,8 +4,9 @@
 rhos_release_rpm:
 
 # OSP/OSPd versioning and build
-version: 10
-rhos_release: 10-director
+version: 12
+rhel_version: 7.4
+rhos_release: 12-director
 build: "ga"
 
 # RDO
