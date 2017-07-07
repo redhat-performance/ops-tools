@@ -53,5 +53,8 @@ allow_external_on_compute: false
 # neutron dns:
 dns_server:
 
+# Run the workaround script for containers
+container_workarounds: false
+
 # instackenv:
 instackenv_json: http://walkabout.foobar.com/cloud/instackenv.json
