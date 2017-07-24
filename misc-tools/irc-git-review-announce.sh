@@ -25,6 +25,7 @@ touch $LOCK
 
 LISTING=$(mktemp /tmp/git-review-XXXXXXX)
 
+git reset --hard origin/master
 git pull origin master
 git review -l | egrep -v '^Found.*items for review' > $LISTING
 
