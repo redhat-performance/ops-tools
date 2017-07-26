@@ -15,6 +15,8 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
 
 ## Requirements
    - RHEL7 or CentOS7+ for Nagios server.
+   -  Requires ```perl-IPC-Run``` and ```perl-IO-Tty``` RPMs for RHEL7.
+      - I've placed them [here](https://funcamp.net/w/rpm/el7/) if you can't find them, CentOS7 has them however.
 
 ## Notes
    - Sets the ```nagiosadmin``` password to ```changeme```, you'll want to change this.
@@ -31,6 +33,7 @@ Ansible Playbook for setting up the Nagios monitoring system and clients on Cent
          - CPU, DISK, VDISK, PS, POWER, TEMP, MEM, FAN
      - SuperMicro server checks via the IPMI interface.
        - CPU, DISK, PS, TEMP, MEM: or anything supported via ```freeipmi``` sensors.
+       - These are broken out by different server type as Supermicro does not consistently use the same sensor IDs.
    - ```contacts.cfg``` notification settings are in ```install/group_vars/all.yml``` and templated for easy modification.
    - Adding new hosts to inventory file will just regenerate the Nagios configs
 
@@ -107,42 +110,43 @@ systemctl restart httpd
 ```
 .
 ├── hosts
-├── install
-│   ├── group_vars
-│   │   └── all.yml
-│   ├── nagios.yml
-│   └── roles
-│       ├── nagios
-│       │   ├── files
-│       │   │   ├── check_ipmi_sensor
-│       │   │   ├── idrac_2.2rc4
-│       │   │   ├── idrac-smiv2.mib
-│       │   │   ├── localhost.cfg
-│       │   │   ├── nagios.cfg
-│       │   │   ├── nagios.conf
-│       │   │   └── services.cfg
-│       │   ├── tasks
-│       │   │   └── main.yml
-│       │   └── templates
-│       │       ├── cgi.cfg.j2
-│       │       ├── commands.cfg.j2
-│       │       ├── contacts.cfg.j2
-│       │       ├── elasticsearch.cfg.j2
-│       │       ├── elkservers.cfg.j2
-│       │       ├── idrac.cfg.j2
-│       │       ├── ipmi.cfg.j2
-│       │       ├── oobservers.cfg.j2
-│       │       ├── servers.cfg.j2
-│       │       ├── supermicro.cfg.j2
-│       │       ├── switches.cfg.j2
-│       │       └── webservers.cfg.j2
-│       └── nagios-client
-│           ├── tasks
-│           │   └── main.yml
-│           └── templates
-│               └── nrpe.cfg.j2
-└── meta
-    └── main.yml
+└── install
+    ├── group_vars
+    │   └── all.yml
+    ├── nagios.yml
+    └── roles
+        ├── nagios
+        │   ├── files
+        │   │   ├── check_ipmi_sensor
+        │   │   ├── idrac_2.2rc4
+        │   │   ├── idrac-smiv2.mib
+        │   │   ├── localhost.cfg
+        │   │   ├── nagios.cfg
+        │   │   ├── nagios.conf
+        │   │   └── services.cfg
+        │   ├── tasks
+        │   │   └── main.yml
+        │   └── templates
+        │       ├── cgi.cfg.j2
+        │       ├── commands.cfg.j2
+        │       ├── contacts.cfg.j2
+        │       ├── elasticsearch.cfg.j2
+        │       ├── elkservers.cfg.j2
+        │       ├── idrac.cfg.j2
+        │       ├── ipmi.cfg.j2
+        │       ├── oobservers.cfg.j2
+        │       ├── servers.cfg.j2
+        │       ├── supermicro1028.cfg.j2
+        │       ├── supermicro-1028r.cfg.j2
+        │       ├── supermicro-6018r.cfg.j2
+        │       ├── supermicro-6048r.cfg.j2
+        │       ├── switches.cfg.j2
+        │       └── webservers.cfg.j2
+        └── nagios-client
+            ├── tasks
+            │   └── main.yml
+            └── templates
+                └── nrpe.cfg.j2
 
-11 directories, 26 files
+10 directories, 28 files
 ```
