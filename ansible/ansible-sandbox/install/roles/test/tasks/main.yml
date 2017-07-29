@@ -13,3 +13,15 @@
 - name: Example Debug Message 2
   debug:
     msg="My IP address is {{ ansible_default_ipv4.address }}"
+
+- name:
+  debug:
+    msg="my hosts are {{ansible_host}}"
+
+- name: Generate Time of Completion
+  local_action: command date +%Y-%m-%d-%H:%M
+  register: currentdate
+
+- name: Print Time of Completion
+  debug:
+    msg="Ansible Playbook for {{ansible_host}} completed at {{currentdate.stdout}}"
