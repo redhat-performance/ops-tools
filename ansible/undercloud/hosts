@@ -1,6 +1,5 @@
 [undercloud]
 # Put your underclouds fully qualified domain name here
-lorenzo.perf.lab.eng.rdu.redhat.com
 
 [hardware_store]
 # put the hwstore's fqdn here

@@ -1,7 +1,7 @@
 ---
 # All variables needed to deploy an undercloud
 
-rhos_release_rpm: http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+rhos_release_rpm:
 
 # OSP/OSPd versioning and build
 version: 12
@@ -37,7 +37,7 @@ version_directory: /etc
 stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsTCIWSAZevFapJIq2OS/qATHQ39PwsJ6JusOBue3nxeNm5mTBM3m97EnQ.
 
 # undercloud control plane interface:
-local_interface: eno2
+local_interface: em2
 
 overcloud_ssl_endpoints: false
 external_network_vip: 172.21.0.10
@@ -51,7 +51,7 @@ private_external_netmask: 255.255.255.0
 allow_external_on_compute: false
 
 # neutron dns:
-dns_server: 10.11.5.19
+dns_server: 8.8.8.8
 
 # instackenv:
-instackenv_json: http://perf1.perf.lab.eng.bos.redhat.com/jtaleric/OpenStack/rdu.json
+instackenv_json:
