@@ -231,8 +231,6 @@
           dest: /home/stack/templates/firstboot/wipe-disks.yaml
         - src: files/wipe-disk.sh
           dest: /home/stack/templates/firstboot/wipe-disk.sh
-        - src: files/container-workarounds.sh
-          dest: /home/stack/container-workarounds.sh
 
     - name: Copy network-environment.yaml
       template:
@@ -339,10 +337,6 @@
           dest: "/home/stack/templates/cloudname.yaml"
       when: overcloud_ssl_endpoints
 
-    - name: Execute container workarounds
-      shell: bash container-workarounds.sh
-      when: container_workarounds
-
 ##################################
 # Typical deployment (Controllers And Computes)
 # date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
@@ -355,17 +349,6 @@
 
 # SSL/TLS Public Endpoints (Modify roles_data.yaml)
 # date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-# Container deployment with workarounds applied
-# openstack overcloud deploy \
-#    --templates /home/stack/tripleo-heat-templates \
-#    --libvirt-type kvm --timeout 90  \
-#    --ntp-server pool.ntp.org \
-#    -e /home/stack/tripleo-heat-templates/environments/disable-telemetry.yaml \
-#    -e /home/stack/tripleo-heat-templates/environments/config-debug.yaml \
-#    -e /home/stack/tripleo-heat-templates/environments/docker.yaml \
-#    -e /home/stack/tripleo-heat-templates/environments/docker-osp12.yaml \
-#    -e /home/stack/customization.yaml 2>&1 | tee /tmp/log-deploy.log
 
 ##################################
 # Using Scheduler-hints.yaml:

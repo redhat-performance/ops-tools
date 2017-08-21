@@ -1,13 +1,13 @@
 ---
 # All variables needed to deploy an undercloud
 
-rhos_release_rpm:
+rhos_release_rpm: http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
 
 # OSP/OSPd versioning and build
 version: 12
 rhel_version: 7.4
 rhos_release: 12-director
-build: "ga"
+build: "2017-07-22.2"
 
 # RDO
 rdo_version: newton
@@ -20,7 +20,7 @@ repos:
     baseurl: http://walkabout.foobar.com/released/RHEL-7/7.3-Beta/Server/x86_64/os/
 
 # Scale lab boot order still broke?
-scale_lab_broke: true
+scale_lab_broke: false
 
 # bulk introspection
 introspection: true
@@ -37,7 +37,7 @@ version_directory: /etc
 stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsTCIWSAZevFapJIq2OS/qATHQ39PwsJ6JusOBue3nxeNm5mTBM3m97EnQ.
 
 # undercloud control plane interface:
-local_interface: em2
+local_interface: eno2
 
 overcloud_ssl_endpoints: false
 external_network_vip: 172.21.0.10
@@ -51,10 +51,7 @@ private_external_netmask: 255.255.255.0
 allow_external_on_compute: false
 
 # neutron dns:
-dns_server:
-
-# Run the workaround script for containers
-container_workarounds: false
+dns_server: 10.11.5.19
 
 # instackenv:
-instackenv_json: http://walkabout.foobar.com/cloud/instackenv.json
+instackenv_json: http://perf1.perf.lab.eng.bos.redhat.com/jtaleric/OpenStack/rdu.json
