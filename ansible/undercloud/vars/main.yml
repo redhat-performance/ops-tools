@@ -55,3 +55,7 @@ dns_server: 8.8.8.8
 
 # instackenv:
 instackenv_json:
+
+
+# enables or disables ironic node cleaning for OSP>9
+ironic_node_cleaning: true
