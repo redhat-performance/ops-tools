@@ -40,7 +40,8 @@ stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsT
 local_interface: em2
 
 # option to enable/disable ironic node cleaning on overcloud nodes
-node_cleaning = true
+node_cleaning: true
+
 overcloud_ssl_endpoints: false
 external_network_vip: 172.21.0.10
 
