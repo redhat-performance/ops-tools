@@ -92,7 +92,13 @@
         - /home/stack/templates/firstboot
 
     - name: Install tripleo
-      yum: name=python-tripleoclient
+      yum:
+        name: python-tripleoclient
+
+    - name: Install ceph-ansible
+      yum:
+        name: ceph-ansible
+      when: version >= 12
 
     - name: Set hostname
       shell: hostnamectl set-hostname {{ansible_fqdn}}
@@ -165,7 +171,7 @@
         dest: /home/stack/instackenv.json
         owner: stack
         group: stack
-    
+
     - name: check if credentials in instackenv.json are correct
       shell: openstack baremetal instackenv validate  -f  /home/stack/instackenv.json
       register: node_status
