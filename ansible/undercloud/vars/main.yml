@@ -7,7 +7,7 @@ rhos_release_rpm:
 version: 12
 rhel_version: 7.4
 rhos_release: 12-director
-build: "2017-07-22.2"
+build: "2017-12-01.4"
 
 # RDO
 rdo_version: newton
@@ -19,12 +19,17 @@ repos:
   rhel-7-server-beta:
     baseurl: http://walkabout.foobar.com/released/RHEL-7/7.3-Beta/Server/x86_64/os/
 
+# Container Registry Details:
+additional_insecure_registry:
+container_namespace: rhosp12
+containers_tag: 12.0-20171201.1
+
 # Scale lab boot order still broke?
 scale_lab_broke: false
 
+# Control Introspection script
 # bulk introspection
 introspection: true
-
 # better introspection, be sure to turn bulk off if you use this
 introspect_with_retry: false
 

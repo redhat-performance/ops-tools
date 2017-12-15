@@ -3,7 +3,7 @@
 # Playbook deploying and setting up your undercloud for overcloud deployment in scale lab
 # environment or the bagl environment.
 #
-# Tested against OSP 8/9/10 and single-nic-vlans config setup with private external network
+# Tested against OSP 8/9/10/11/12 and single-nic-vlans config setup with private external network
 #
 
 # Tasks as root
@@ -165,6 +165,44 @@
     - name: Setup DNS on Undercloud Neutron subnet
       shell: ". /home/stack/stackrc; neutron subnet-update {{neutron_subnet_uuid.stdout}} --dns-nameserver {{dns_server}}"
 
+    # Setup Container Registry - Pike (OSP12)
+    - name: Append additional insecure registry to /etc/sysconfig/docker
+      become: true
+      lineinfile:
+        path: /etc/sysconfig/docker
+        state: present
+        regexp: '^INSECURE_REGISTRY='
+        line: 'INSECURE_REGISTRY="--insecure-registry 192.168.24.1:8787 --insecure-registry 192.168.24.3:8787 --insecure-registry {{additional_insecure_registry}}"'
+      when: version >= 12
+
+    - name: Restart Docker registry
+      become: true
+      service:
+        name: docker
+        state: restarted
+      when: version >= 12
+
+    - name: Create template to pull images to local registry
+      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{container_namespace}} --tag {{containers_tag}} --pull-source {{additional_insecure_registry}} --prefix openstack --suffix docker --push-destination 192.168.24.1:8787 --images-file overcloud_containers.yaml"
+      when: version >= 12
+
+    # (akrzos) I could not get this command to respond without:
+    # "Error while fetching server API version: ('Connection aborted.', error(13, 'Permission denied'))"
+    # thus I added retry to this command and yet it still requires rerunning this specific command
+    - name: Pull images using the container_images.yaml
+      shell: ". /home/stack/stackrc; openstack overcloud container image upload --config-file overcloud_containers.yaml"
+      register: pull_images
+      until: pull_images.rc == 0
+      retries: 2
+      delay: 10
+      ignore_errors: true
+      when: version >= 12
+
+    - name: Create template for using images from local registry
+      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --tag {{containers_tag}} --namespace 192.168.24.1:8787/{{container_namespace}} --prefix openstack --suffix docker --env-file ~/docker_registry.yaml -r ~/templates/roles_data.yaml"
+      when: version >= 12
+    # End Setup Container Registry
+
     - name: Get instackenv.json
       get_url:
         url: "{{instackenv_json}}"
@@ -232,6 +270,8 @@
           dest: /home/stack/templates/nic-configs/cinder-storage.yaml
         - src: files/swift-storage.yaml
           dest: /home/stack/templates/nic-configs/swift-storage.yaml
+        - src: files/deploy.sh
+          dest: /home/stack/deploy.sh
         - src: files/tunings.yaml
           dest: /home/stack/tunings.yaml
         - src: files/ceph-pool-tune.yaml
@@ -243,19 +283,19 @@
         - src: files/wipe-disk.sh
           dest: /home/stack/templates/firstboot/wipe-disk.sh
 
-    - name: Copy network-environment.yaml
+    - name: Template out Heat Templates
       template:
-        src: "templates/network-environment.yaml.j2"
-        dest: /home/stack/templates/network-environment.yaml
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
         owner: stack
         group: stack
-
-    - name: Copy storage-environment.yaml
-      template:
-        src: "templates/storage-environment.yaml.j2"
-        dest: /home/stack/templates/storage-environment.yaml
-        owner: stack
-        group: stack
+      with_items:
+        - src: "templates/network-environment.yaml.j2"
+          dest: "/home/stack/templates/network-environment.yaml"
+        - src: "templates/storage-environment.yaml.j2"
+          dest: "/home/stack/templates/storage-environment.yaml"
+        - src: "templates/deploy.yaml.j2"
+          dest: "/home/stack/templates/deploy.yaml"
 
     # (WARNING) This is more than likely a hack to allow external network addresses on compute nodes
     - name: Fix /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml
@@ -347,54 +387,3 @@
         - src: "templates/cloudname.yaml.j2"
           dest: "/home/stack/templates/cloudname.yaml"
       when: overcloud_ssl_endpoints
-
-##################################
-# Typical deployment (Controllers And Computes)
-# date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-# Modifing roles_data.yaml
-# date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-# SSL/TLS Public Endpoints (Typical)
-# date;time openstack overcloud deploy --templates -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-# SSL/TLS Public Endpoints (Modify roles_data.yaml)
-# date;time openstack overcloud deploy --templates -r /home/stack/templates/roles_data.yaml -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 ;date
-
-##################################
-# Using Scheduler-hints.yaml:
-# Set your Controllers:
-# openstack baremetal node set --property capabilities='node:controller-0' <ironic-uuid>
-# openstack baremetal node set --property capabilities='node:controller-1' <ironic-uuid>
-# openstack baremetal node set --property capabilities='node:controller-2' <ironic-uuid>
-# Set computes like above:
-# openstack baremetal node set --property capabilities='node:novacompute-0' <ironic-uuid>
-# ...
-# Set cephstorage nodes (If you have any):
-# openstack baremetal node set --property capabilities='node:cephstorage-0' <ironic-uuid>
-# ...
-# Set objectstorage nodes (If you have any):
-# openstack baremetal node set --property capabilities='node:objectstorage-0' <ironic-uuid>
-# ...
-# Set blockstorage nodes (If you have any):
-# openstack baremetal node set --property capabilities='node:blockstorage-0' <ironic-uuid>
-
-# Typical deployment (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --control-flavor baremetal --compute-flavor baremetal ;date
-
-# SSL/TLS Public Endpoints (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /home/stack/templates/enable-tls.yaml -e /home/stack/templates/inject-trust-anchor.yaml -e /home/stack/templates/cloudname.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/tls-endpoints-public-dns.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --control-flavor baremetal --compute-flavor baremetal ;date
-
-# With CephStorage (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/templates/storage-environment.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --ceph-storage-scale 4 --control-flavor baremetal --compute-flavor baremetal --ceph-storage-flavor baremetal ;date
-
-# With ObjectStorage (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 3 --compute-scale 6 --swift-storage-scale 4 --control-flavor baremetal --compute-flavor baremetal --swift-storage-flavor baremetal ;date
-# * Edit role_data.yml to remove swift storage off controllers (Especially if the disk count does not match)
-
-# With BlockStorage (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e /home/stack/templates/scheduler-hints.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 1 --compute-scale 1 --block-storage-scale 1 --control-flavor baremetal --compute-flavor baremetal --block-storage-flavor  baremetal; date
-
-# All Node Types (w/ scheduler-hints.yaml)
-# date;time openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml -e /home/stack/templates/network-environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml -e /home/stack/templates/storage-environment.yaml -e /home/stack/tunings.yaml --libvirt-type=kvm --ntp-server 0.pool.ntp.org --neutron-network-type vxlan --neutron-tunnel-types vxlan --control-scale 1 --compute-scale 1 --block-storage-scale 1 --swift-storage-scale 1 --ceph-storage-scale 1 --control-flavor baremetal --compute-flavor baremetal --block-storage-flavor  baremetal --swift-storage-flavor baremetal --ceph-storage-flavor baremetal; date
-# * Edit role_data.yml to remove swift storage off controllers (Especially if the disk count does not match)
