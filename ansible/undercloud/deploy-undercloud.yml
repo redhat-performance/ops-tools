@@ -247,6 +247,27 @@
         - swift-storage
       when: scale_lab_broke
 
+    # Pin Nodes:
+    - name: Copy pin.py to Undercloud
+      copy:
+        src: files/pin.py
+        dest: /home/stack/pin.py
+        owner: stack
+        group: stack
+        mode: 0744
+      when: pin_nodes
+
+    - name: Copy Node pinning definition to pin.yaml
+      copy:
+        content: "{{ pin_nodes_definition | to_yaml }}"
+        dest: /home/stack/pin.yaml
+      when: pin_nodes
+
+    - name: Run pin.py
+      shell: . /home/stack/stackrc; /home/stack/pin.py /home/stack/pin.yaml
+      when: pin_nodes
+    # End Pin Nodes
+
     - name: Copy original network configuration files
       shell: cp -r /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans ~/templates/nic-configs
 
