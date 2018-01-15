@@ -23,6 +23,7 @@ repos:
 additional_insecure_registry:
 container_namespace: rhosp12
 containers_tag: 12.0-20171201.1
+local_docker_registry: true
 
 # Scale lab boot order still broke?
 scale_lab_broke: false
