@@ -1,0 +1,106 @@
+---
+# Playbook for setting up an Elastic Cluster
+#  ONLY USE BEHIND A VPN DOES NOT SECURE CLUSTER
+
+- name: Install packages
+  hosts: all
+  user: root
+  serial: 1
+  tasks:
+    - name: Install epel
+      yum: name=epel-release state=present
+
+    - name: Install OpenJDK
+      yum: name=java-1.8.0-openjdk-devel
+
+    - name: Setup Elastic repo
+      yum_repository:
+        name: elastic
+        description: repo for elasticsearch
+        baseurl: https://packages.elastic.co/elasticsearch/2.x/centos
+        gpgcheck: no
+
+    - name: Install Elastic
+      yum: name=elasticsearch state=present
+
+    - name: Increase open files limit
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: "{{item}}"
+        state: present
+      with_items:
+        - "root             soft nofile 500000"
+        - "root             hard nofile 500000"
+      register: fs_limits
+
+    - name: Rebooting ...
+      shell: sleep 1 & sudo reboot now
+      async: 1
+      poll: 0
+      ignore_errors: true
+      when: fs_limits | changed
+
+    - name: Wait for reboot
+      become: false
+      local_action: wait_for
+      args:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        state: started
+        delay: 30
+        timeout: 180
+      when: fs_limits | changed
+
+    - name: stop firewall
+      service: name=iptables enabled=no state=stopped
+
+
+
+
+- name: Template Master Nodes
+  hosts: master
+  user: root
+  serial: 1
+  vars:
+    - is_master: "true"
+    - is_data: "false"
+  tasks:
+    - name: Template elasticsearch.yml
+      template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+
+- name: Template Data Nodes
+  hosts: data
+  user: root
+  serial: 1
+  vars:
+    - is_master: "false"
+    - is_data: "true"
+  tasks:
+    - name: Template elasticsearch.yml
+      template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+
+- name: Template Client Nodes
+  hosts: client
+  user: root
+  serial: 1
+  vars:
+    - is_master: "false"
+    - is_data: "false"
+  tasks:
+    - name: Template elasticsearch.yml
+      template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml
+
+- name: template logging.yml
+  hosts: all
+  user: root
+  serial: 1
+  tasks:
+    - name: template logging yml
+      template: src=templates/logging.yml.j2 dest=/etc/elasticsearch/logging.yml
+
+    - name: Clean up logs
+      shell: "cd /var/log/elasticsearch; rm -f *"
+      become: true
+
+    - name: Restart Elastic
+      service: name=elasticsearch state=restarted enabled=yes
