@@ -202,10 +202,10 @@
       shell: ". /home/stack/stackrc; openstack overcloud container image prepare --tag {{containers_tag}} --namespace 192.168.24.1:8787/{{container_namespace}} --prefix openstack --suffix docker --env-file ~/docker_registry.yaml -r ~/templates/roles_data.yaml"
       when: version >= 12 and local_docker_registry
 
-   - name: Create template for using images from remote registry
-     shell:
-       cmd: openstack overcloud container image prepare --namespace={{additional_insecure_registry}}/{{container_namespace}} --env-file=/home/stack/docker_registry.yaml --prefix=openstack --tag={{containers_tag}}
-     when: version >= 12 and not local_docker_registry
+    - name: Create template for using images from remote registry
+      shell:
+        cmd: openstack overcloud container image prepare --namespace={{additional_insecure_registry}}/{{container_namespace}} --env-file=/home/stack/docker_registry.yaml --prefix=openstack --tag={{containers_tag}}
+      when: version >= 12 and not local_docker_registry
     # End Setup Container Registry
 
     - name: Get instackenv.json
