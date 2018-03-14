@@ -1,0 +1,401 @@
+[DEFAULT]
+
+#
+# From instack-undercloud
+#
+
+# Fully qualified hostname (including domain) to set on the
+# Undercloud. If left unset, the current hostname will be used, but
+# the user is responsible for configuring all system hostname settings
+# appropriately.  If set, the undercloud install will configure all
+# system hostname settings. (string value)
+#undercloud_hostname = <None>
+
+# IP information for the interface on the Undercloud that will be
+# handling the PXE boots and DHCP for Overcloud instances.  The IP
+# portion of the value will be assigned to the network interface
+# defined by local_interface, with the netmask defined by the prefix
+# portion of the value. (string value)
+#local_ip = 192.168.24.1/24
+
+# Virtual IP or DNS address to use for the public endpoints of
+# Undercloud services. Only used with SSL. (string value)
+# Deprecated group/name - [DEFAULT]/undercloud_public_vip
+#undercloud_public_host = 192.168.24.2
+
+# Virtual IP or DNS address to use for the admin endpoints of
+# Undercloud services. Only used with SSL. (string value)
+# Deprecated group/name - [DEFAULT]/undercloud_admin_vip
+#undercloud_admin_host = 192.168.24.3
+
+# DNS nameserver(s) to use for the undercloud node. (list value)
+#undercloud_nameservers =
+
+# List of ntp servers to use. (list value)
+#undercloud_ntp_servers =
+
+# DNS domain name to use when deploying the overcloud. The overcloud
+# parameter "CloudDomain" must be set to a matching value. (string
+# value)
+#overcloud_domain_name = localdomain
+
+# List of routed network subnets for provisioning and introspection.
+# Comma separated list of names/tags. For each network a section/group
+# needs to be added to the configuration file with these parameters
+# set: cidr, dhcp_start, dhcp_end, inspection_iprange, gateway and
+# masquerade_network.
+#
+# Example:
+#
+# subnets = subnet1,subnet2
+#
+# An example section/group in config file:
+#
+# [subnet1]
+# cidr = 192.168.10.0/24
+# dhcp_start = 192.168.10.100
+# dhcp_end = 192.168.10.200
+# inspection_iprange = 192.168.10.20,192.168.10.90
+# gateway = 192.168.10.254
+# masquerade_network = True
+# [subnet2]
+# . . .
+#  (list value)
+#subnets = ctlplane-subnet
+
+# Name of the local subnet, where the PXE boot and DHCP interfaces for
+# overcloud instances is located. The IP address of the
+# local_ip/local_interface should reside in this subnet. (string
+# value)
+#local_subnet = ctlplane-subnet
+
+# Certificate file to use for OpenStack service SSL connections.
+# Setting this enables SSL for the OpenStack API endpoints, leaving it
+# unset disables SSL. (string value)
+#undercloud_service_certificate =
+
+# When set to True, an SSL certificate will be generated as part of
+# the undercloud install and this certificate will be used in place of
+# the value for undercloud_service_certificate.  The resulting
+# certificate will be written to
+# /etc/pki/tls/certs/undercloud-[undercloud_public_host].pem.  This
+# certificate is signed by CA selected by the
+# "certificate_generation_ca" option. (boolean value)
+#generate_service_certificate = false
+
+# The certmonger nickname of the CA from which the certificate will be
+# requested. This is used only if the generate_service_certificate
+# option is set. Note that if the "local" CA is selected the
+# certmonger's local CA certificate will be extracted to /etc/pki/ca-
+# trust/source/anchors/cm-local-ca.pem and subsequently added to the
+# trust chain. (string value)
+#certificate_generation_ca = local
+
+# The kerberos principal for the service that will use the
+# certificate. This is only needed if your CA requires a kerberos
+# principal. e.g. with FreeIPA. (string value)
+#service_principal =
+
+# Network interface on the Undercloud that will be handling the PXE
+# boots and DHCP for Overcloud instances. (string value)
+#local_interface = eth1
+local_interface = {{local_interface}}
+
+# MTU to use for the local_interface. (integer value)
+#local_mtu = 1500
+
+# DEPRECATED: Network that will be masqueraded for external access, if
+# required. This should be the subnet used for PXE booting. (string
+# value)
+# This option is deprecated for removal.
+# Its value may be silently ignored in the future.
+# Reason: With support for routed networks, masquerading of the
+# provisioning networks is moved to a boolean option for each subnet.
+#masquerade_network = 192.168.24.0/24
+
+# Path to hieradata override file. If set, the file will be copied
+# under /etc/puppet/hieradata and set as the first file in the hiera
+# hierarchy. This can be used to custom configure services beyond what
+# undercloud.conf provides (string value)
+#hieradata_override =
+
+# Path to network config override template. If set, this template will
+# be used to configure the networking via os-net-config. Must be in
+# json format. Templated tags can be used within the template, see
+# instack-undercloud/elements/undercloud-stack-config/net-
+# config.json.template for example tags (string value)
+#net_config_override =
+
+# Network interface on which inspection dnsmasq will listen.  If in
+# doubt, use the default value. (string value)
+# Deprecated group/name - [DEFAULT]/discovery_interface
+#inspection_interface = br-ctlplane
+
+# Whether to enable extra hardware collection during the inspection
+# process. Requires python-hardware or python-hardware-detect package
+# on the introspection image. (boolean value)
+#inspection_extras = true
+
+# Whether to run benchmarks when inspecting nodes. Requires
+# inspection_extras set to True. (boolean value)
+# Deprecated group/name - [DEFAULT]/discovery_runbench
+#inspection_runbench = false
+
+# Whether to support introspection of nodes that have UEFI-only
+# firmware. (boolean value)
+#inspection_enable_uefi = true
+
+# Makes ironic-inspector enroll any unknown node that PXE-boots
+# introspection ramdisk in Ironic. By default, the "fake" driver is
+# used for new nodes (it is automatically enabled when this option is
+# set to True). Set discovery_default_driver to override.
+# Introspection rules can also be used to specify driver information
+# for newly enrolled nodes. (boolean value)
+#enable_node_discovery = false
+
+# The default driver or hardware type to use for newly discovered
+# nodes (requires enable_node_discovery set to True). It is
+# automatically added to enabled_drivers or enabled_hardware_types
+# accordingly. (string value)
+#discovery_default_driver = ipmi
+
+# Whether to enable the debug log level for Undercloud OpenStack
+# services. (boolean value)
+#undercloud_debug = true
+
+# Whether to update packages during the Undercloud install. (boolean
+# value)
+#undercloud_update_packages = true
+
+# Whether to install Tempest in the Undercloud. (boolean value)
+#enable_tempest = true
+
+# Whether to install Telemetry services (ceilometer, gnocchi, aodh,
+# panko ) in the Undercloud. (boolean value)
+#enable_telemetry = false
+
+# Whether to install the TripleO UI. (boolean value)
+#enable_ui = true
+
+# Whether to install requirements to run the TripleO validations.
+# (boolean value)
+#enable_validations = true
+
+# Whether to install the Volume service. It is not currently used in
+# the undercloud. (boolean value)
+#enable_cinder = false
+
+# Whether to install novajoin metadata service in the Undercloud.
+# (boolean value)
+#enable_novajoin = false
+
+# Whether to install the Octavia client in the Undercloud. (boolean
+# value)
+#enable_octavia = false
+
+# One Time Password to register Undercloud node with an IPA server.
+# Required when enable_novajoin = True. (string value)
+#ipa_otp =
+
+# Whether to use iPXE for deploy and inspection. (boolean value)
+# Deprecated group/name - [DEFAULT]/ipxe_deploy
+#ipxe_enabled = true
+
+# Maximum number of attempts the scheduler will make when deploying
+# the instance. You should keep it greater or equal to the number of
+# bare metal nodes you expect to deploy at once to work around
+# potential race condition when scheduling. (integer value)
+# Minimum value: 1
+#scheduler_max_attempts = 30
+
+# Whether to clean overcloud nodes (wipe the hard drive) between
+# deployments and after the introspection. (boolean value)
+#clean_nodes = false
+clean_nodes = {{node_cleaning}}
+
+# DEPRECATED: List of enabled bare metal drivers. (list value)
+# This option is deprecated for removal.
+# Its value may be silently ignored in the future.
+# Reason: Please switch to hardware types and the
+# enabled_hardware_types option.
+#enabled_drivers = pxe_ipmitool,pxe_drac,pxe_ilo
+
+# List of enabled bare metal hardware types (next generation drivers).
+# (list value)
+#enabled_hardware_types = ipmi,redfish,ilo,idrac
+
+# An optional docker 'registry-mirror' that will beconfigured in
+# /etc/docker/daemon.json. (string value)
+#docker_registry_mirror =
+
+# List of additional architectures enabled in your cloud environment.
+# The list of supported values is: ppc64le (list value)
+#additional_architectures =
+
+# Enable support for routed ctlplane networks. (boolean value)
+#enable_routed_networks = false
+
+
+[auth]
+
+#
+# From instack-undercloud
+#
+
+# Password used for MySQL root user. If left unset, one will be
+# automatically generated. (string value)
+#undercloud_db_password = <None>
+
+# Keystone admin token. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_admin_token = <None>
+
+# Keystone admin password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_admin_password = <None>
+
+# Glance service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_glance_password = <None>
+
+# Heat db encryption key(must be 16, 24, or 32 characters. If left
+# unset, one will be automatically generated. (string value)
+#undercloud_heat_encryption_key = <None>
+
+# Heat service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_heat_password = <None>
+
+# Heat cfn service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_heat_cfn_password = <None>
+
+# Neutron service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_neutron_password = <None>
+
+# Nova service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_nova_password = <None>
+
+# Ironic service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_ironic_password = <None>
+
+# Aodh service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_aodh_password = <None>
+
+# Gnocchi service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_gnocchi_password = <None>
+
+# Ceilometer service password. If left unset, one will be
+# automatically generated. (string value)
+#undercloud_ceilometer_password = <None>
+
+# Panko service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_panko_password = <None>
+
+# Ceilometer metering secret. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_ceilometer_metering_secret = <None>
+
+# Ceilometer snmpd read-only user. If this value is changed from the
+# default, the new value must be passed in the overcloud environment
+# as the parameter SnmpdReadonlyUserName. This value must be between 1
+# and 32 characters long. (string value)
+#undercloud_ceilometer_snmpd_user = ro_snmp_user
+
+# Ceilometer snmpd password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_ceilometer_snmpd_password = <None>
+
+# Swift service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_swift_password = <None>
+
+# Mistral service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_mistral_password = <None>
+
+# Rabbitmq cookie. If left unset, one will be automatically generated.
+# (string value)
+#undercloud_rabbit_cookie = <None>
+
+# Rabbitmq password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_rabbit_password = <None>
+
+# Rabbitmq username. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_rabbit_username = <None>
+
+# Heat stack domain admin password. If left unset, one will be
+# automatically generated. (string value)
+#undercloud_heat_stack_domain_admin_password = <None>
+
+# Swift hash suffix. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_swift_hash_suffix = <None>
+
+# HAProxy stats password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_haproxy_stats_password = <None>
+
+# Zaqar password. If left unset, one will be automatically generated.
+# (string value)
+#undercloud_zaqar_password = <None>
+
+# Horizon secret key. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_horizon_secret_key = <None>
+
+# Cinder service password. If left unset, one will be automatically
+# generated. (string value)
+#undercloud_cinder_password = <None>
+
+# Novajoin vendordata plugin service password. If left unset, one will
+# be automatically generated. (string value)
+#undercloud_novajoin_password = <None>
+
+
+[ctlplane-subnet]
+
+#
+# From instack-undercloud
+#
+
+# Network CIDR for the Neutron-managed subnet for Overcloud instances.
+# (string value)
+# Deprecated group/name - [DEFAULT]/network_cidr
+#cidr = 192.168.24.0/24
+
+# Start of DHCP allocation range for PXE and DHCP of Overcloud
+# instances on this network. (string value)
+# Deprecated group/name - [DEFAULT]/dhcp_start
+#dhcp_start = 192.168.24.5
+dhcp_start = 192.168.24.51
+
+# End of DHCP allocation range for PXE and DHCP of Overcloud instances
+# on this network. (string value)
+# Deprecated group/name - [DEFAULT]/dhcp_end
+#dhcp_end = 192.168.24.24
+dhcp_end = 192.168.24.250
+
+# Temporary IP range that will be given to nodes on this network
+# during the inspection process. Should not overlap with the range
+# defined by dhcp_start and dhcp_end, but should be in the same ip
+# subnet. (string value)
+# Deprecated group/name - [DEFAULT]/inspection_iprange
+#inspection_iprange = 192.168.24.100,192.168.24.120
+inspection_iprange = 192.168.24.5,192.168.24.50
+
+# Network gateway for the Neutron-managed network for Overcloud
+# instances on this network. (string value)
+# Deprecated group/name - [DEFAULT]/network_gateway
+#gateway = 192.168.24.1
+
+# The network will be masqueraded for external access. (boolean value)
+#masquerade = false

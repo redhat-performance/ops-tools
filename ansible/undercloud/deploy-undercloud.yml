@@ -166,7 +166,7 @@
       shell: ". /home/stack/stackrc; neutron subnet-update {{neutron_subnet_uuid.stdout}} --dns-nameserver {{dns_server}}"
 
     # Setup Container Registry - Pike (OSP12)
-    - name: Append additional insecure registry to /etc/sysconfig/docker
+    - name: Pike(12)/Queens(13) Append additional insecure registry to /etc/sysconfig/docker
       become: true
       lineinfile:
         path: /etc/sysconfig/docker
@@ -175,21 +175,21 @@
         line: 'INSECURE_REGISTRY="--insecure-registry 192.168.24.1:8787 --insecure-registry 192.168.24.3:8787 --insecure-registry {{additional_insecure_registry}}"'
       when: version >= 12
 
-    - name: Restart Docker registry
+    - name: Pike(12)/Queens(13) Restart Docker registry
       become: true
       service:
         name: docker
         state: restarted
       when: version >= 12
 
-    - name: Create template to pull images to local registry
-      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{container_namespace}} --tag {{containers_tag}} --pull-source {{additional_insecure_registry}} --prefix openstack --suffix docker --push-destination 192.168.24.1:8787 --images-file overcloud_containers.yaml"
+    - name: Pike(12)/Queens(13) Create template to pull images to local registry
+      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{container_namespace}} --tag {{containers_tag}} --pull-source {{additional_insecure_registry}} --prefix openstack --push-destination 192.168.24.1:8787 --images-file overcloud_containers.yaml"
       when: version >= 12 and local_docker_registry
 
     # (akrzos) I could not get this command to respond without:
     # "Error while fetching server API version: ('Connection aborted.', error(13, 'Permission denied'))"
     # thus I added retry to this command and yet it still requires rerunning this specific command
-    - name: Pull images using the container_images.yaml
+    - name: Pike(12)/Queens(13) Pull images using the container_images.yaml
       shell: ". /home/stack/stackrc; openstack overcloud container image upload --config-file overcloud_containers.yaml"
       register: pull_images
       until: pull_images.rc == 0
@@ -198,11 +198,11 @@
       ignore_errors: true
       when: version >= 12 and local_docker_registry
 
-    - name: Create template for using images from local registry
+    - name: Pike(12)/Queens(13) Create template for using images from local registry
       shell: ". /home/stack/stackrc; openstack overcloud container image prepare --tag {{containers_tag}} --namespace 192.168.24.1:8787/{{container_namespace}} --prefix openstack --suffix docker --env-file ~/docker_registry.yaml -r ~/templates/roles_data.yaml"
       when: version >= 12 and local_docker_registry
 
-    - name: Create template for using images from remote registry
+    - name: Pike(12)/Queens(13) Create template for using images from remote registry
       shell:
         cmd: openstack overcloud container image prepare --namespace={{additional_insecure_registry}}/{{container_namespace}} --env-file=/home/stack/docker_registry.yaml --prefix=openstack --tag={{containers_tag}}
       when: version >= 12 and not local_docker_registry
@@ -215,16 +215,46 @@
         owner: stack
         group: stack
 
-    - name: check if credentials in instackenv.json are correct
+    - name: Newton(10)/Ocata(11)/Pike(12) check if credentials in instackenv.json are correct
       shell: openstack baremetal instackenv validate  -f  /home/stack/instackenv.json
       register: node_status
       failed_when: "'SUCCESS' not in node_status.stdout"
+      when: version < 13
 
-    - name: Import instackenv.json
-      shell: . /home/stack/stackrc; openstack baremetal import --json /home/stack/instackenv.json
+    - name: Queens(13) Import instackenv.json
+      shell: |
+        . /home/stack/stackrc
+        openstack overcloud node import /home/stack/instackenv.json
+      when: version >= 13
 
-    - name: Configure boot
-      shell: . /home/stack/stackrc; openstack baremetal configure boot
+    - name: Newton(10)/Ocata(11)/Pike(12) Import instackenv.json
+      shell: |
+        . /home/stack/stackrc
+        openstack baremetal import --json /home/stack/instackenv.json
+      when: version < 13
+
+    - name: Queens(13) Configure boot
+      shell: |
+        . /home/stack/stackrc
+        openstack overcloud node configure --all-manageable
+      when: version >= 13
+
+    - name: Newton(10)/Ocata(11)/Pike(12) Configure boot
+      shell: |
+        . /home/stack/stackrc
+        openstack baremetal configure boot
+      when: version < 13
+
+    - name: Queens(13) Set Nodes to provide
+      shell: |
+        . /home/stack/stackrc
+        openstack overcloud node provide --all-manageable
+      when:
+        - version >= 13
+        - not introspection
+        - not introspect_with_retry
+
+    # TODO: Queens(13) Determine if we need to wait for cleaning to finish after pushing nodes to provide
 
     - name: Template introspection script
       template:

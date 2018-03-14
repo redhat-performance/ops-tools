@@ -36,13 +36,13 @@ introspect_with_retry: false
 
 # Node Pinning:
 # Note, in order to pin nodes, configure pin_nodes_definition with expected format
-# Format is ipmi_address: (node id Example: controller-0 or novacompute-0)
+# Format is "unique portion of ipmi_address": (node id Example: controller-0 or novacompute-0)
 pin_nodes: false
 # pin_nodes_definition:
-#   perf-1-mm.ipmi_address.com: controller-0
-#   perf-2-mm.ipmi_address.com: cephstorage-0
-#   perf-3-mm.ipmi_address.com: novacompute-0
-#   perf-4-mm.ipmi_address.com: objectstorage-0
+#   perf-1-mm: controller-0
+#   perf-2-mm: cephstorage-0
+#   perf-3-mm: novacompute-0
+#   perf-4-mm: objectstorage-0
 
 # Dump version file to this directory
 version_directory: /etc
