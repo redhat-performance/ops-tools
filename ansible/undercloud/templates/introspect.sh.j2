@@ -19,15 +19,9 @@ source /home/stack/stackrc
 ## * Introspect hardware attributes of nodes.
 ## ::
 
-{% if version < 13 %}
-
-openstack baremetal introspection bulk start
-
-{% else %}
 
 openstack overcloud node introspect --all-manageable --provide
 
-{% endif %}
 
 {% endif %}
 
