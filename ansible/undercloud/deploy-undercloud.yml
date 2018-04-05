@@ -270,6 +270,7 @@
 
     - name: Generate node-data
       shell: . /home/stack/stackrc; mkdir ~/node-data; for i in `ironic node-list | grep avail | awk '{print $2}'`; do openstack baremetal introspection data save $i > node-data/$i; done
+      when: introspection or introspection_with_retry
 
     - name: Remove boot_option:local from flavors
       shell: ". /home/stack/stackrc; openstack flavor unset --property 'capabilities:boot_option' {{item}}"
