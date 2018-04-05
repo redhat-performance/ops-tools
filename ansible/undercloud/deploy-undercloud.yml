@@ -221,29 +221,17 @@
       failed_when: "'SUCCESS' not in node_status.stdout"
       when: version < 13
 
-    - name: Queens(13) Import instackenv.json
+    - name: Import instackenv.json
       shell: |
         . /home/stack/stackrc
         openstack overcloud node import /home/stack/instackenv.json
       when: version >= 13
 
-    - name: Newton(10)/Ocata(11)/Pike(12) Import instackenv.json
-      shell: |
-        . /home/stack/stackrc
-        openstack baremetal import --json /home/stack/instackenv.json
-      when: version < 13
-
-    - name: Queens(13) Configure boot
+    - name: Configure boot
       shell: |
         . /home/stack/stackrc
         openstack overcloud node configure --all-manageable
       when: version >= 13
-
-    - name: Newton(10)/Ocata(11)/Pike(12) Configure boot
-      shell: |
-        . /home/stack/stackrc
-        openstack baremetal configure boot
-      when: version < 13
 
     - name: Queens(13) Set Nodes to provide
       shell: |
