@@ -225,20 +225,17 @@
       shell: |
         . /home/stack/stackrc
         openstack overcloud node import /home/stack/instackenv.json
-      when: version >= 13
 
     - name: Configure boot
       shell: |
         . /home/stack/stackrc
         openstack overcloud node configure --all-manageable
-      when: version >= 13
 
-    - name: Queens(13) Set Nodes to provide
+    - name: Set Nodes to provide
       shell: |
         . /home/stack/stackrc
         openstack overcloud node provide --all-manageable
       when:
-        - version >= 13
         - not introspection
         - not introspect_with_retry
 
