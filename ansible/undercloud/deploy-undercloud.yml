@@ -183,14 +183,14 @@
       when: version >= 12
 
     - name: Pike(12)/Queens(13) Create template to pull images to local registry
-      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{container_namespace}} --tag {{containers_tag}} --pull-source {{additional_insecure_registry}} --prefix openstack --push-destination 192.168.24.1:8787 --images-file overcloud_containers.yaml"
+      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{additional_insecure_registry}}/{{container_namespace}} --tag {{containers_tag}}  --prefix openstack --push-destination 192.168.24.1:8787 --output-images-file ~/overcloud_containers.yaml --output-env-file ~/docker_registry.yaml"
       when: version >= 12 and local_docker_registry
 
     # (akrzos) I could not get this command to respond without:
     # "Error while fetching server API version: ('Connection aborted.', error(13, 'Permission denied'))"
     # thus I added retry to this command and yet it still requires rerunning this specific command
     - name: Pike(12)/Queens(13) Pull images using the container_images.yaml
-      shell: ". /home/stack/stackrc; openstack overcloud container image upload --config-file overcloud_containers.yaml"
+      shell: ". /home/stack/stackrc; openstack overcloud container image upload --config-file ~/overcloud_containers.yaml"
       register: pull_images
       until: pull_images.rc == 0
       retries: 2
@@ -198,13 +198,8 @@
       ignore_errors: true
       when: version >= 12 and local_docker_registry
 
-    - name: Pike(12)/Queens(13) Create template for using images from local registry
-      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --tag {{containers_tag}} --namespace 192.168.24.1:8787/{{container_namespace}} --prefix openstack --suffix docker --env-file ~/docker_registry.yaml -r ~/templates/roles_data.yaml"
-      when: version >= 12 and local_docker_registry
-
     - name: Pike(12)/Queens(13) Create template for using images from remote registry
-      shell:
-        cmd: openstack overcloud container image prepare --namespace={{additional_insecure_registry}}/{{container_namespace}} --env-file=/home/stack/docker_registry.yaml --prefix=openstack --tag={{containers_tag}}
+      shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{additional_insecure_registry}}/{{container_namespace}} --prefix openstack --tag={{containers_tag}} --output-env-file ~/docker_registry.yaml"
       when: version >= 12 and not local_docker_registry
     # End Setup Container Registry
 
