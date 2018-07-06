@@ -30,7 +30,7 @@ kinit -f -k -t rtuser.keytab rtuser/host01.example.com@example.COM
 
 # now curl and scrape the tickets page
 # change 'your-rtqueue' to your RT queue in the URl below
-curl --insecure -s --negotiate -u :  -o - 'https://engineering.example.com/rt/Search/Results.html?Query=Queue%20%3D%20%27your-rtqueue%27%20AND%20%28Status%20%3D%20%27new%27%20OR%20Status%20%3D%20%27open%27%20OR%20Status%20%3D%20%27stalled%27%20OR%20Status%20%3D%20%27needinfo%27%29' > $TMPHTML
+curl --insecure -s --negotiate -u :  -o - 'https://engineering.example.com/rt/Search/Results.html?Query=Queue%20%3D%20%27your-rtqueue%27%20AND%20%28Status%20%3D%20%27new%27%20OR%20Status%20%3D%20%27open%27%20OR%20Status%20%3D%20%27stalled%27%20OR%20Status%20%3D%20%27needinfo%27%29&RowsPerPage=0' > $TMPHTML
 elinks -dump-width 1000 -dump 1 $TMPHTML | sed '1,/Gantt Chart/d' | sed '/Time to display:/,$d' > $TMPFILE
 
 # links to the tickets will look like this:
