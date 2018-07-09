@@ -6,15 +6,15 @@
 # files for internal RFC1918 interfaces that start with 172.x that
 # we drop down after systems are provisioned.
 ########### to just disable the interfaces
-# ./cleanup-interfaces.sh --disable
+# ./clean-interfaces.sh --disable
 ########### to remove the interfaces
-# ./cleanup-interfaces.sh --nuke
+# ./clean-interfaces.sh --nuke
 
 # print usage if not specified
 if [[ $# -eq 0 ]]; then
     echo "USAGE:"
-    echo "./cleanup-interfaces.sh --disable"
-    echo "./cleanup-interfaces.sh --nuke"
+    echo "./clean-interfaces.sh --disable"
+    echo "./clean-interfaces.sh --nuke"
     exit 1
 fi
 
