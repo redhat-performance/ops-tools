@@ -12,10 +12,10 @@
 
 # print usage if not specified
 if [[ $# -eq 0 ]]; then
-        echo "USAGE:"
-        echo "./cleanup-interfaces.sh --disable"
-	    echo "./cleanup-interfaces.sh --nuke"
-	    exit 1
+    echo "USAGE:"
+    echo "./cleanup-interfaces.sh --disable"
+    echo "./cleanup-interfaces.sh --nuke"
+    exit 1
 fi
 
 mode=$1
