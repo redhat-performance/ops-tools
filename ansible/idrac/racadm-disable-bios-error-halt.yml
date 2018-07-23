@@ -1,0 +1,66 @@
+---
+- gather_facts: False
+  name: check for racadm
+  vars:
+    untouchables: mgmt-foreman.example.com
+  hosts: all:!{{untouchables}}
+  tasks:
+
+# Delete the jobqueue to we can search it reliably later
+    - name: racadm jobqueue delete
+      raw: racadm jobqueue delete --all
+      args:
+        executable: ''
+      register: result_jobqueue
+    - debug: var=result_jobqueue
+
+# Ensure we are starting with a powered down system
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
+
+# setup the bios setting
+    - name: racadm setup boot
+      raw: racadm set BIOS.MiscSettings.ErrPrompt Disabled
+      args:
+        executable: ''
+      register: result_bios_setup
+    - debug: var=result_bios_setup
+
+# Commit the changes to the bios
+    - name: racadm bios reconfigure powercycle
+      raw: racadm jobqueue create BIOS.Setup.1-1 -r pwrcycle -s TIME_NOW
+      args:
+        executable: ''
+      register: result_pwrcycle
+    - debug: var=result_pwrcycle
+
+# Turn on the server
+    - name: racadm serveraction powerup
+      raw: racadm serveraction powerup
+      args:
+        executable: ''
+      register: result_powerup
+    - debug: var=result_powerup
+
+# Now wait for the jobqueue to finish
+    - name: racadm check complete
+      raw: racadm jobqueue view
+      args:
+        executable: ''
+      register: result_check_complete
+      until: result_check_complete.stdout.find("Status=Completed") != -1 and result_check_complete.stdout.find("Status=Running") == -1
+      retries: 2000
+      delay: 10
+    - debug: var=result_check_complete
+
+# Ensure we are starting with a powered down system
+    - name: racadm serveraction powerdown
+      raw: racadm serveraction powerdown
+      args:
+        executable: ''
+      register: result_powerdown
+    - debug: var=result_powerdown
