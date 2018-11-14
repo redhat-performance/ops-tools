@@ -3,10 +3,12 @@
 # announces updates and merges
 # Requires: Supybot and notify plugin, git
 
+# adjust these to your liking
 PROJECTDIR=/home/quads/git/quads
 LISTING_STATEDIR=/home/quads/review
 LOCK=/home/quads/.quads.cron.lock
 COMMITURL="https://github.com/redhat-performance/quads/commit"
+GERRITPROJ="redhat-performance/quads"
 
 cd $PROJECTDIR
 
@@ -43,11 +45,11 @@ for review in $(awk '{ print $1 }' $LISTING) ; do
   else
     if [ ! -f $LISTING_STATEDIR/$review ]; then
       msg="$(echo "$info" | sed 's/[0-9][0-9]*[ ][ ]*[^ ][^ ]*[ ][ ]*\(.*\)/\1/g')"
-      echo "#quads New Review  :: https://review.gerrithub.io/#/c/$id/  || branch: $branch || $msg" | nc 127.0.0.1 5556
+      echo "#quads New Review  :: https://review.gerrithub.io/c/$GERRITPROJ/$id/  || branch: $branch || $msg" | nc 127.0.0.1 5556
     else
       if [ x"$(echo "$latestline" | awk '{ print $1 }')" != x"$(head -1 $LISTING_STATEDIR/$review | awk '{ print $1 }')" ]; then
         msg="$(echo "$latestline" | sed 's/[^ ][^ ]*[ ][ ]*\(.*\)/\1/g')"
-        echo "#quads Review Updated :: https://review.gerrithub.io/#/c/$id/  || branch: $branch || $msg" | nc 127.0.0.1 5556
+        echo "#quads Review Updated :: https://review.gerrithub.io/c/$GERRITPROJ/$id/  || branch: $branch || $msg" | nc 127.0.0.1 5556
       fi
     fi
   fi
@@ -59,7 +61,7 @@ git checkout master
 for review in $(cd /home/quads/review ; ls ) ; do
   if [ "$(git log --pretty=oneline | grep "$(cat /home/quads/review/$review)")" ]; then
     msg="$(cat /home/quads/review/$review)"
-    echo "#quads Review Merged :: https://review.gerrithub.io/#/c/$id/  || branch: $branch || $COMMITURL/$msg" | nc 127.0.0.1 5556
+    echo "#quads Review Merged :: https://review.gerrithub.io/c/$GERRITPROJ/$id/  || branch: $branch || $COMMITURL/$msg" | nc 127.0.0.1 5556
     rm -f /home/quads/review/$review
   fi
 done
