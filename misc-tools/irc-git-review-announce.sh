@@ -8,7 +8,7 @@ PROJECTDIR=/home/quads/git/quads
 LISTING_STATEDIR=/home/quads/review
 LOCK=/home/quads/.quads.cron.lock
 COMMITURL="https://github.com/redhat-performance/quads/commit"
-GERRITPROJ="redhat-performance/quads"
+GERRITPROJ="redhat-performance/+/quads"
 
 cd $PROJECTDIR
 
