@@ -1,7 +1,7 @@
 ---
 # Variables listed here are applicable to all host groups
-wp_version: 4.9.7
-wp_sha256sum: c983447a09159085b5a2839779e3925b66327330734cecb6ab09a9a40451c2a6
+wp_version: 4.9.8
+wp_sha256sum: 37acdd94dd45257d3afa055b9c31f62d9daa5c5d0bfc4ee37f4f62c30bf0686b
 
 # MySQL settings
 mysqlservice: mysqld
