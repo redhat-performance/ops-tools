@@ -15,7 +15,7 @@ wp_db_password: YourPasswordHere
 # This is used for the nginx server configuration, but access to the
 # WordPress site is not restricted by a named host.
 nginx_port: 80
-server_hostname: wiki.example.com
+server_hostname: wiki.rdu2.scalelab.redhat.com
 
 # Disable All Updates
 # By default automatic updates are enabled, set this value to true to disable all automatic updates
