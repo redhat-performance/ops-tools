@@ -1,0 +1,20 @@
+---
+
+- name: Install collectd
+  hosts: all
+  user: root
+  vars:
+      graphite_host: norton.perf.lab.eng.rdu.redhat.com
+      cluster_name: scale_elastic_cluster
+  tasks:
+    - name: Install epel
+      yum: name=epel-release state=present
+
+    - name: Install collectd
+      yum: name=collectd state=present
+
+    - name: Template config
+      template: src=templates/collectd.conf.j2 dest=/etc/collectd.conf
+
+    - name: Bounce collectd
+      service: name=collectd state=restarted enabled=yes

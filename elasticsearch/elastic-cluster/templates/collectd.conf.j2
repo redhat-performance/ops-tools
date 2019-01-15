@@ -1,0 +1,104 @@
+# Interval default is 10s
+Interval 10
+
+Hostname "{{ansible_hostname}}"
+
+# Loaded Plugins:
+LoadPlugin "logfile"
+<Plugin "logfile">
+  File "/var/log/collectd.log"
+  LogLevel "info"
+  PrintSeverity true
+  Timestamp true
+</Plugin>
+
+LoadPlugin write_graphite
+#LoadPlugin network
+LoadPlugin cpu
+LoadPlugin df
+LoadPlugin disk
+LoadPlugin interface
+LoadPlugin irq
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin processes
+LoadPlugin swap
+LoadPlugin unixsock
+LoadPlugin uptime
+
+<Plugin write_graphite>
+  <Carbon>
+    Host "{{graphite_host}}"
+    Port "2003"
+    Prefix "{{cluster_name}}."
+    Protocol "tcp"
+    LogSendErrors true
+    StoreRates true
+    AlwaysAppendDS false
+    EscapeCharacter "_"
+  </Carbon>
+</Plugin>
+
+# Open unix domain socket for collectdctl
+<Plugin unixsock>
+  SocketFile "/var/run/collectd-unixsock"
+  SocketGroup "collectd"
+  SocketPerms "0770"
+  DeleteSocket true
+</Plugin>
+
+<Plugin df>
+  FSType anon_inodefs
+  FSType bdev
+  FSType cgroup
+  FSType cpuset
+  FSType debugfs
+  FSType devpts
+  FSType devtmpfs
+  FSType ecryptfs
+  FSType fuse
+  FSType fusectl
+  FSType hugetlbfs
+  FSType mqueue
+  FSType nfs
+  FSType nfs4
+  FSType nfsd
+  FSType pipefs
+  FSType proc
+  FSType pstore
+  FSType ramfs
+  #FSType rootfs
+  FSType rpc_pipefs
+  FSType securityfs
+  FSType sockfs
+  FSType sysfs
+  FSType tmpfs
+  FSType vboxsf
+  IgnoreSelected true
+  ValuesPercentage true
+  ReportInodes true
+</Plugin>
+
+<Plugin disk>
+  Disk "/^[hsv]d[a-z]+[0-9]?$/"
+  Disk "/^nvm/"
+  IgnoreSelected false
+</Plugin>
+
+<Plugin processes>
+  ProcessMatch "elasticsearch" "java.*elasticsearch"
+  ProcessMatch "logstash" "java.*logstash"
+  #Process "nginx"
+  #Kibana if nginx is running too
+  # Collect on collectd process
+  Process "collectd"
+</Plugin>
+
+
+<Plugin swap>
+  ReportBytes true
+  ValuesPercentage true
+</Plugin>
+
+# Include other collectd configuration files
+Include "/etc/collectd.d"
