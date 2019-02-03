@@ -13,6 +13,10 @@ cd ansible/copy-ssh-keys
 * Add the names of your servers to the inventory file under the cloud group like so.
 
 ```
+vi hosts
+```
+
+```
 [cloud]
 host01.scalelab.example.com
 host02.scalelab.example.com
