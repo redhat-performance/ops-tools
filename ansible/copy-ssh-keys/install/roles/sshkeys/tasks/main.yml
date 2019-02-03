@@ -1,0 +1,26 @@
+---
+
+# figure out local username
+- name: Gathering username info
+  local_action: command whoami
+  register: youruser
+  ignore_errors: true
+
+- name: Gathering user home directory location
+  local_action: shell echo $HOME
+  register: userhome
+  ignore_errors: true
+
+# copy any keys added to ../../files/authorized_keys
+- name: Copy keys added to authorized_keys
+  authorized_key:
+    user=root
+    key="{{ lookup('file', 'authorized_keys') }}"
+
+# copy local user's key
+- name: Copy id_rsa.pub if found locally
+  authorized_key:
+    user=root
+    key="{{ lookup('file', '{{userhome.stdout}}/.ssh/id_rsa.pub') }}"
+    manage_dir=yes
+  ignore_errors: true
