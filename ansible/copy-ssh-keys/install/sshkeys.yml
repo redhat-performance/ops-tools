@@ -4,8 +4,6 @@
 #
 
 - hosts: cloud
-  vars:
-      ansible_user: root
   remote_user: root
   roles:
     - { role: sshkeys }
