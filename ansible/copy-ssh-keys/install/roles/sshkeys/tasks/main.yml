@@ -1,11 +1,6 @@
 ---
 
-# figure out local username
-- name: Gathering username info
-  local_action: command whoami
-  register: youruser
-  ignore_errors: true
-
+# obtain home directory, should work for Linux and OSX
 - name: Gathering user home directory location
   local_action: shell echo $HOME
   register: userhome
@@ -17,7 +12,7 @@
     user=root
     key="{{ lookup('file', 'authorized_keys') }}"
 
-# copy local user's key
+# copy local user's key if called id_rsa.pub
 - name: Copy id_rsa.pub if found locally
   authorized_key:
     user=root

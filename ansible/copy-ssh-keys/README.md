@@ -10,6 +10,8 @@ git clone https://github.com/redhat-performance/ops-tools/
 cd ansible/copy-ssh-keys
 ```
 
+#### Add Hosts
+
 * Add the names of your servers to the inventory file under the cloud group like so.
 
 ```
@@ -26,6 +28,8 @@ host02.scalelab.example.com
 ```
 /opt/quads/bin/quads-cli --cloud-only cloud02 >> hosts
 ```
+
+#### Add SSH Keys
 
 * By default this will copy `id_rsa.pub` found in your local user home directory where you run Ansible.
 
