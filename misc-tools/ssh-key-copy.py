@@ -1,51 +1,49 @@
-#!/usr/bin/env python
-#-*- coding: iso-8859-15 -*-
-# simple tool to interactively copy additional ssh keys to hosts
-# assumes you have root credentials or key already in place
-# you should use the Ansible authorized_key module if you want
-# to truly manage your keys properly however:
-# http://docs.ansible.com/ansible/authorized_key_module.html#examples
 
-import os
+from paramiko import SSHClient, AutoAddPolicy
+import argparse
 
-# print hosts menu
-menu = """
----------------------------
-|   SSH Key Copier 5000   |
----------------------------
-"""
-print "%s" % (menu)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Copy public ssh key to authorized_keys on a remote host."
+    )
+    parser.add_argument(
+        "--host", dest="host", type=str, default=None, help="Remote host"
+    )
+    parser.add_argument(
+        "--user", dest="user", type=str, default=None, help="Remote user"
+    )
+    parser.add_argument(
+        "--passwd", dest="passwd", type=str, default=None, help="Remote pass"
+    )
+    parser.add_argument(
+        "--ssh-key", dest="ssh_key", type=str, default=None, help="Public SSH Key"
+    )
+    _args = parser.parse_args()
 
-# prompt for target hosts
-print "Enter Target Hosts"
-ssh_hosts = ""
-stopword = ""
-while True:
-    line = str(raw_input())
-    if line.strip() == stopword:
-        break
-    ssh_hosts += "%s\n" % line
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    ssh.load_system_host_keys()
 
-os.system('clear')
+    ssh.connect(
+        _args.host,
+        username=_args.user,
+        password=_args.passwd,
+        look_for_keys=False,
+        allow_agent=False,
+    )
+    transport = ssh.get_transport()
+    channel = transport.open_session()
+    channel.setblocking(1)
 
-# prompt for keys
-print "Enter SSH Keys"
-ssh_keys = ""
-stopword = ""
-while True:
-    line = str(raw_input())
-    if line.strip() == stopword:
-        break
-    ssh_keys += "%s\n" % line
+    with open(_args.ssh_key, "r") as _file:
+        key = _file.readline().strip()
 
-os.system('clear')
+    command = 'echo "%s" >> ~/.ssh/authorized_keys' % key
+    stdin, stdout, stderr = ssh.exec_command(command)
 
-# iterate through keys, hosts and copy
-def CopyKeys():
-    for key in ssh_keys.splitlines():
-        for host in ssh_hosts.splitlines():
-            copycommand = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-			-n root@%s 'echo %s >> ~/.ssh/authorized_keys'" % (host,key)
-            print "Copying SSH Keys to %s" % (host)
-            os.system(copycommand)
-CopyKeys()
+    if stderr.readlines():
+        print("There was something wrong with your request")
+        for line in stderr.readlines():
+            print(line)
+    else:
+        print("Your key was copied succesfully")
