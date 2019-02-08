@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+# Simple python cli tool for copying public ssh keys to authorized_keys file
+# on remote host via the python paramiko library.
 
 from paramiko import SSHClient, AutoAddPolicy
 import argparse
