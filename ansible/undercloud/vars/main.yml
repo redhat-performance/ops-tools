@@ -24,6 +24,7 @@ additional_insecure_registry:
 container_namespace: rhosp12
 containers_tag: 12.0-20171201.1
 local_docker_registry: true
+container_images_file: /home/stack/containers-prepare-parameter.yaml
 
 # Scale lab boot order still broke?
 scale_lab_broke: false
@@ -55,6 +56,8 @@ stack_password: $6$rounds=656000$3ZalBI1dHsb8kfJI$XbtraTo6qcAfAHR158Wf4mLoUrDQsT
 # undercloud control plane interface:
 local_interface: em2
 
+# NTP servers
+ntp_servers: clock.redhat.com
 # option to enable/disable ironic node cleaning on overcloud nodes
 node_cleaning: true
 

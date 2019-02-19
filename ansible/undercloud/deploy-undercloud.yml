@@ -137,7 +137,13 @@
     - vars/main.yml
   remote_user: stack
   tasks:
-    - name: Install undercloud
+    - name: Template containers file
+      template:
+        src: templates/containers-prepare-parameter.j2.yaml
+        dst: "{{container_images_file}}" 
+      when: version >= 14
+
+    - name: Install undercloud 
       shell: openstack undercloud install
 
     - name: Install ipa and overcloud images
@@ -173,18 +179,18 @@
         state: present
         regexp: '^INSECURE_REGISTRY='
         line: 'INSECURE_REGISTRY="--insecure-registry 192.168.24.1:8787 --insecure-registry 192.168.24.3:8787 --insecure-registry {{additional_insecure_registry}}"'
-      when: version >= 12
+      when: version >= 12 and version < 14
 
     - name: Pike(12)/Queens(13) Restart Docker registry
       become: true
       service:
         name: docker
         state: restarted
-      when: version >= 12
+      when: version >= 12 and version < 14
 
     - name: Pike(12)/Queens(13) Create template to pull images to local registry
       shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{additional_insecure_registry}}/{{container_namespace}} --tag {{containers_tag}}  --prefix openstack --push-destination 192.168.24.1:8787 --output-images-file ~/overcloud_containers.yaml --output-env-file ~/docker_registry.yaml"
-      when: version >= 12 and local_docker_registry
+      when: version >= 12 and version < 14 and local_docker_registry
 
     # (akrzos) I could not get this command to respond without:
     # "Error while fetching server API version: ('Connection aborted.', error(13, 'Permission denied'))"
@@ -196,12 +202,16 @@
       retries: 2
       delay: 10
       ignore_errors: true
-      when: version >= 12 and local_docker_registry
+      when: version >= 12 and version < 14 and local_docker_registry
 
     - name: Pike(12)/Queens(13) Create template for using images from remote registry
       shell: ". /home/stack/stackrc; openstack overcloud container image prepare --namespace {{additional_insecure_registry}}/{{container_namespace}} --prefix openstack --tag={{containers_tag}} --output-env-file ~/docker_registry.yaml"
-      when: version >= 12 and not local_docker_registry
+      when: (version >= 12 and version < 14) and not local_docker_registry
     # End Setup Container Registry
+
+    - name: Container image prepare (OSP 14)
+      shell: openstack tripleo container image prepare -e  {{container_images_file}} --output-env-file /home/stack/docker_registry.yaml
+      when: version >= 14
 
     - name: Get instackenv.json
       get_url:

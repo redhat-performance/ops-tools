@@ -1,0 +1,337 @@
+[DEFAULT]
+
+#
+# From undercloud_config
+#
+
+# List of additional architectures enabled in your cloud environment.
+# The list of supported values is: ppc64le (list value)
+#additional_architectures =
+
+# The certmonger nickname of the CA from which the certificate will be
+# requested. This is used only if the generate_service_certificate
+# option is set. Note that if the "local" CA is selected the
+# certmonger's local CA certificate will be extracted to /etc/pki/ca-
+# trust/source/anchors/cm-local-ca.pem and subsequently added to the
+# trust chain. (string value)
+#certificate_generation_ca = local
+
+# Whether to clean overcloud nodes (wipe the hard drive) between
+# deployments and after the introspection. (boolean value)
+#clean_nodes = false
+
+# Cleanup temporary files. Setting this to False will leave the
+# temporary files used during deployment in place after the command is
+# run. This is useful for debugging the generated files or if errors
+# occur. (boolean value)
+#cleanup = true
+
+# Heat environment file with parameters for all required container
+# images. Or alternatively, parameter "ContainerImagePrepare" to drive
+# the required image preparation. (string value)
+container_images_file = {{container_images_file}}
+
+# List of any custom environment yaml files to use. These are applied
+# after any other configuration and can be used to override any
+# derived values. This should be used only by advanced users. (list
+# value)
+#custom_env_files =
+
+# User used to run openstack undercloud install command which will be
+# used to add the user to the docker group, required to upload
+# containers (string value)
+#deployment_user = <None>
+
+# The default driver or hardware type to use for newly discovered
+# nodes (requires enable_node_discovery set to True). It is
+# automatically added to enabled_hardware_types. (string value)
+#discovery_default_driver = ipmi
+
+# Docker bridge IP for the undercloud. (string value)
+#docker_bip = --bip=172.31.0.1/24
+
+# Used to add custom insecure registries in /etc/sysconfig/docker.
+docker_insecure_registries = {{additional_insecure_registry}},192.168.24.1:8787
+
+# An optional docker 'registry-mirror' that will beconfigured in
+# /etc/docker/daemon.json. (string value)
+#docker_registry_mirror =
+
+# Whether to install the Volume service. It is not currently used in
+# the undercloud. (boolean value)
+#enable_cinder = false
+
+# Whether to enable the ironic service. (boolean value)
+#enable_ironic = true
+
+# Whether to enable the ironic inspector service. (boolean value)
+#enable_ironic_inspector = true
+
+# Whether to enable the mistral service. (boolean value)
+#enable_mistral = true
+
+# Makes ironic-inspector enroll any unknown node that PXE-boots
+# introspection ramdisk in Ironic. By default, the "fake" driver is
+# used for new nodes (it is automatically enabled when this option is
+# set to True). Set discovery_default_driver to override.
+# Introspection rules can also be used to specify driver information
+# for newly enrolled nodes. (boolean value)
+#enable_node_discovery = false
+
+# Whether to install novajoin metadata service in the Undercloud.
+# (boolean value)
+#enable_novajoin = false
+
+# Enable support for routed ctlplane networks. (boolean value)
+#enable_routed_networks = false
+
+# Whether to enable Swift encryption at-rest or not. (boolean value)
+#enable_swift_encryption = false
+
+# Whether to install Telemetry services (ceilometer, gnocchi, aodh,
+# panko ) in the Undercloud. (boolean value)
+#enable_telemetry = false
+
+# Whether to install Tempest in the Undercloud.This is a no-op for
+# containerized undercloud. (boolean value)
+#enable_tempest = true
+
+# Whether to install the TripleO UI. (boolean value)
+#enable_ui = true
+
+# Whether to install requirements to run the TripleO validations.
+# (boolean value)
+#enable_validations = true
+
+# Whether to enable the zaqar service. (boolean value)
+#enable_zaqar = true
+
+# List of enabled bare metal hardware types (next generation drivers).
+# (list value)
+#enabled_hardware_types = ipmi,redfish,ilo,idrac
+
+# When set to True, an SSL certificate will be generated as part of
+# the undercloud install and this certificate will be used in place of
+# the value for undercloud_service_certificate.  The resulting
+# certificate will be written to
+# /etc/pki/tls/certs/undercloud-[undercloud_public_host].pem.  This
+# certificate is signed by CA selected by the
+# "certificate_generation_ca" option. (boolean value)
+#generate_service_certificate = true
+
+# URL for the heat container image to use. (string value)
+#heat_container_image =
+
+# Use native heat templates. (boolean value)
+#heat_native = true
+
+# Path to hieradata override file. Relative paths get computed inside
+# of $HOME. When it points to a heat env file, it is passed in t-h-t
+# via "-e <file>", as is. When the file contains legacy instack data,
+# it is wrapped with UndercloudExtraConfig and also passed in for
+# t-h-t as a temp file created in output_dir. Note, instack hiera data
+# may be not t-h-t compatible and will highly likely require a manual
+# revision. (string value)
+#hieradata_override =
+
+# Whether to enable extra hardware collection during the inspection
+# process. Requires python-hardware or python-hardware-detect package
+# on the introspection image. (boolean value)
+#inspection_extras = true
+
+# Network interface on which inspection dnsmasq will listen.  If in
+# doubt, use the default value. (string value)
+# Deprecated group/name - [DEFAULT]/discovery_interface
+#inspection_interface = br-ctlplane
+
+# Whether to run benchmarks when inspecting nodes. Requires
+# inspection_extras set to True. (boolean value)
+# Deprecated group/name - [DEFAULT]/discovery_runbench
+#inspection_runbench = false
+
+# One Time Password to register Undercloud node with an IPA server.
+# Required when enable_novajoin = True. (string value)
+#ipa_otp =
+
+# Whether to use iPXE for deploy and inspection. (boolean value)
+# Deprecated group/name - [DEFAULT]/ipxe_deploy
+#ipxe_enabled = true
+
+# Network interface on the Undercloud that will be handling the PXE
+# boots and DHCP for Overcloud instances. (string value)
+local_interface = {{local_interface}}
+
+# IP information for the interface on the Undercloud that will be
+# handling the PXE boots and DHCP for Overcloud instances.  The IP
+# portion of the value will be assigned to the network interface
+# defined by local_interface, with the netmask defined by the prefix
+# portion of the value. (string value)
+#local_ip = 192.168.24.1/24
+
+# MTU to use for the local_interface. (integer value)
+#local_mtu = 1500
+
+# Name of the local subnet, where the PXE boot and DHCP interfaces for
+# overcloud instances is located. The IP address of the
+# local_ip/local_interface should reside in this subnet. (string
+# value)
+#local_subnet = ctlplane-subnet
+
+# Path to network config override template.Relative paths get computed
+# inside of of $HOME. Must be in the json format.Its content overrides
+# anything in t-h-t UndercloudNetConfigOverride. The processed
+# template is then passed in Heat via the undercloud_parameters.yaml
+# file created in output_dir and used to configure the networking via
+# run-os-net-config. If you wish to disable you can set this location
+# to an empty file.Templated for instack j2 tags may be used, for
+# example:
+#
+# "network_config": [
+#  {
+#   "type": "ovs_bridge",
+#   "name": "br-ctlplane",
+#   "ovs_extra": [
+#    "br-set-external-id br-ctlplane bridge-id br-ctlplane"
+#   ],
+#   "members": [
+#    {
+#     "type": "interface",
+#     "name": "{{LOCAL_INTERFACE}}",
+#     "primary": "true",
+#     "mtu": {{LOCAL_MTU}},
+#     "dns_servers": {{UNDERCLOUD_NAMESERVERS}}
+#    }
+#   ],
+#   "addresses": [
+#     {
+#       "ip_netmask": "{{PUBLIC_INTERFACE_IP}}"
+#     }
+#   ],
+#   "routes": {{SUBNETS_STATIC_ROUTES}},
+#   "mtu": {{LOCAL_MTU}}
+# }
+# ]
+#   (string value)
+#net_config_override =
+
+# Directory to output state, processed heat templates, ansible
+# deployment files. (string value)
+#output_dir = /builddir
+
+# DNS domain name to use when deploying the overcloud. The overcloud
+# parameter "CloudDomain" must be set to a matching value. (string
+# value)
+#overcloud_domain_name = localdomain
+
+# Roles file to override for heat. May be an absolute path or the path
+# relative to the t-h-t templates directory used for deployment
+# (string value)
+#roles_file = <None>
+
+# Maximum number of attempts the scheduler will make when deploying
+# the instance. You should keep it greater or equal to the number of
+# bare metal nodes you expect to deploy at once to work around
+# potential race condition when scheduling. (integer value)
+# Minimum value: 1
+#scheduler_max_attempts = 30
+
+# The kerberos principal for the service that will use the
+# certificate. This is only needed if your CA requires a kerberos
+# principal. e.g. with FreeIPA. (string value)
+#service_principal =
+
+# List of routed network subnets for provisioning and introspection.
+# Comma separated list of names/tags. For each network a section/group
+# needs to be added to the configuration file with these parameters
+# set: cidr, dhcp_start, dhcp_end, inspection_iprange, gateway and
+# masquerade_network. Note: The section/group must be placed before or
+# after any other section. (See the example section [ctlplane-subnet]
+# in the sample configuration file.) (list value)
+#subnets = ctlplane-subnet
+
+# heat templates file to override. (string value)
+#templates =
+
+# Virtual IP or DNS address to use for the admin endpoints of
+# Undercloud services. Only used with SSL. (string value)
+# Deprecated group/name - [DEFAULT]/undercloud_admin_vip
+#undercloud_admin_host = 192.168.24.3
+
+# Whether to enable the debug log level for Undercloud OpenStack
+# services. (boolean value)
+#undercloud_debug = true
+
+# Enable or disable SELinux during the deployment. (boolean value)
+#undercloud_enable_selinux = true
+
+# Fully qualified hostname (including domain) to set on the
+# Undercloud. If left unset, the current hostname will be used, but
+# the user is responsible for configuring all system hostname settings
+# appropriately.  If set, the undercloud install will configure all
+# system hostname settings. (string value)
+#undercloud_hostname = <None>
+
+# The path to a log file to store the undercloud install/upgrade logs.
+# (string value)
+#undercloud_log_file = install-undercloud.log
+
+# DNS nameserver(s) to use for the undercloud node. (list value)
+#undercloud_nameservers =
+
+# List of ntp servers to use. (list value)
+undercloud_ntp_servers = {{ntp_servers}}
+
+# Virtual IP or DNS address to use for the public endpoints of
+# Undercloud services. Only used with SSL. (string value)
+# Deprecated group/name - [DEFAULT]/undercloud_public_vip
+#undercloud_public_host = 192.168.24.2
+
+# Certificate file to use for OpenStack service SSL connections.
+# Setting this enables SSL for the OpenStack API endpoints, leaving it
+# unset disables SSL. (string value)
+#undercloud_service_certificate =
+
+# Whether to update packages during the Undercloud install. This is a
+# no-op for containerized undercloud. (boolean value)
+#undercloud_update_packages = false
+
+# (Experimental) Whether to clean undercloud rpms after an upgrade to
+# a containerized undercloud. (boolean value)
+#upgrade_cleanup = false
+
+
+[ctlplane-subnet]
+
+#
+# From undercloud_config
+#
+
+# Network CIDR for the Neutron-managed subnet for Overcloud instances.
+# (string value)
+# Deprecated group/name - [DEFAULT]/network_cidr
+#cidr = 192.168.24.0/24
+
+# End of DHCP allocation range for PXE and DHCP of Overcloud instances
+# on this network. (string value)
+# Deprecated group/name - [DEFAULT]/dhcp_end
+#dhcp_end = 192.168.24.24
+
+# Start of DHCP allocation range for PXE and DHCP of Overcloud
+# instances on this network. (string value)
+# Deprecated group/name - [DEFAULT]/dhcp_start
+#dhcp_start = 192.168.24.5
+
+# Network gateway for the Neutron-managed network for Overcloud
+# instances on this network. (string value)
+# Deprecated group/name - [DEFAULT]/network_gateway
+#gateway = 192.168.24.1
+
+# Temporary IP range that will be given to nodes on this network
+# during the inspection process. Should not overlap with the range
+# defined by dhcp_start and dhcp_end, but should be in the same ip
+# subnet. (string value)
+# Deprecated group/name - [DEFAULT]/inspection_iprange
+#inspection_iprange = 192.168.24.100,192.168.24.120
+
+# The network will be masqueraded for external access. (boolean value)
+#masquerade = false
