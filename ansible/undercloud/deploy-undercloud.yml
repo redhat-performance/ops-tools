@@ -140,7 +140,7 @@
     - name: Template containers file
       template:
         src: templates/containers-prepare-parameter.j2.yaml
-        dst: "{{container_images_file}}" 
+        dest: "{{container_images_file}}" 
       when: version >= 14
 
     - name: Install undercloud 
@@ -210,7 +210,7 @@
     # End Setup Container Registry
 
     - name: Container image prepare (OSP 14)
-      shell: openstack tripleo container image prepare -e  {{container_images_file}} --output-env-file /home/stack/docker_registry.yaml
+      shell: . /home/stack/stackrc; openstack tripleo container image prepare -e  {{container_images_file}} --output-env-file /home/stack/docker_registry.yaml
       when: version >= 14
 
     - name: Get instackenv.json

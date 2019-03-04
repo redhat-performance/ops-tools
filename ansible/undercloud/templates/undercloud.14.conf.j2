@@ -2,8 +2,6 @@
 
 #
 # From undercloud_config
-#
-
 # List of additional architectures enabled in your cloud environment.
 # The list of supported values is: ppc64le (list value)
 #additional_architectures =
@@ -177,41 +175,6 @@ local_interface = {{local_interface}}
 # value)
 #local_subnet = ctlplane-subnet
 
-# Path to network config override template.Relative paths get computed
-# inside of of $HOME. Must be in the json format.Its content overrides
-# anything in t-h-t UndercloudNetConfigOverride. The processed
-# template is then passed in Heat via the undercloud_parameters.yaml
-# file created in output_dir and used to configure the networking via
-# run-os-net-config. If you wish to disable you can set this location
-# to an empty file.Templated for instack j2 tags may be used, for
-# example:
-#
-# "network_config": [
-#  {
-#   "type": "ovs_bridge",
-#   "name": "br-ctlplane",
-#   "ovs_extra": [
-#    "br-set-external-id br-ctlplane bridge-id br-ctlplane"
-#   ],
-#   "members": [
-#    {
-#     "type": "interface",
-#     "name": "{{LOCAL_INTERFACE}}",
-#     "primary": "true",
-#     "mtu": {{LOCAL_MTU}},
-#     "dns_servers": {{UNDERCLOUD_NAMESERVERS}}
-#    }
-#   ],
-#   "addresses": [
-#     {
-#       "ip_netmask": "{{PUBLIC_INTERFACE_IP}}"
-#     }
-#   ],
-#   "routes": {{SUBNETS_STATIC_ROUTES}},
-#   "mtu": {{LOCAL_MTU}}
-# }
-# ]
-#   (string value)
 #net_config_override =
 
 # Directory to output state, processed heat templates, ansible
