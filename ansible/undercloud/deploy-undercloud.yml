@@ -211,7 +211,13 @@
 
     - name: Container image prepare (OSP 14)
       shell: . /home/stack/stackrc; openstack tripleo container image prepare -e  {{container_images_file}} --output-env-file /home/stack/docker_registry.yaml
+      register: pull_images
+      until: pull_images.rc == 0
+      retries: 2
+      delay: 10
+      ignore_errors: true
       when: version >= 14
+      
 
     - name: Get instackenv.json
       get_url:
