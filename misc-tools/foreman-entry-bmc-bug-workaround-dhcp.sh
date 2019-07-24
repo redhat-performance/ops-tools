@@ -1,5 +1,9 @@
 #!/bin/sh
 #
+# 1) remove foreman sub-interfaces that are bmc devices
+# 2) re-add them as proper bmc devices
+# 3) re-adding forces dhcpd.leases update where some were missing.
+#
 # this works around a Foreman API bug we found when trying to restore
 # (re-define) BMC / OOB DHCP entries in Foreman that were removed by sync
 # problems between dhcpd and foreman-proxy introduced while trying to accomodate
@@ -14,7 +18,9 @@
 # been deleted, but we do know the IP address we have to compare what ipcalc
 # tells us is the subnet_id then pass that in to successfully complete the
 # command.
-
+#
+# note this also sets up proper ipmi/bmc functionality through Foreman UI now.
+#
 # 12:03 wfoster: hammer host info --name f10-h29-b01-5039ms.rdu2.example.com | grep Id | grep "2)" | awk '{print $3}'
 # 12:03 wfoster: hammer host interface delete --host f10-h29-b01-5039ms.rdu2.example.com --id 1681
 # 12:03 wfoster: hammer host interface create --host f10-h29-b01-5039ms.rdu2.example.com --type bmc --provider IPMI --mac ac:1f:6b:75:a9:77 --ip 10.1.33.27 --name mgmt-f10-h29-b01-5039ms.rdu2.example.com --username=root --password=XXXXXXX
@@ -29,7 +35,7 @@
 #5  | rdu2_mgmt4 | 10.1.44.0    | 23             | 255.255.254.0 |         | DHCP
 #---|------------|--------------|----------------|---------------|---------|----------
 
-# Usage: foreman-entry-bmc-bug-workaround-dhcp.sh HOSTNAME_MISSING_IPMI | tee -a ~/my-ass-bleeds.log
+# Usage: foreman-entry-bmc-bug-workaround-dhcp.sh HOSTNAME_MISSING_IPMI | tee -a ~/host-results.log
 
 host=$1
 
