@@ -1,7 +1,7 @@
 ---
 # Variables listed here are applicable to all host groups
-wp_version: 4.9.8
-wp_sha256sum: 37acdd94dd45257d3afa055b9c31f62d9daa5c5d0bfc4ee37f4f62c30bf0686b
+wp_version: 5.2.3
+wp_sha256sum: 990f93815160ef75850f515608d812337982d2f79c1a34a0727e476ce16ff81d
 
 # MySQL settings
 mysqlservice: mysqld
@@ -15,7 +15,7 @@ wp_db_password: YourPasswordHere
 # This is used for the nginx server configuration, but access to the
 # WordPress site is not restricted by a named host.
 nginx_port: 80
-server_hostname: wiki.rdu2.scalelab.redhat.com
+server_hostname: wiki.example.com
 
 # Disable All Updates
 # By default automatic updates are enabled, set this value to true to disable all automatic updates
