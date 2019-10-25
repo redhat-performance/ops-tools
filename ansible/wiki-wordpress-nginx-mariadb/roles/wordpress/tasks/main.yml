@@ -29,12 +29,41 @@
 - name: Change ownership of WordPress installation
   file: path=/srv/wordpress/ owner=wordpress group=wordpress state=directory recurse=yes
 
+- name: Install unzip
+  yum:
+    name: ['unzip']
+    state: present
+
+- name: Copy Krusze Theme
+  copy:
+    src=theme/krusze.0.9.7.zip
+    dest=/tmp/krusze.0.9.7.zip
+
+- name: Copy Jetpack Markdown Plugin
+  copy:
+    src=plugin/jetpack-markdown.3.9.6.zip
+    dest=/tmp/jetpack-markdown.3.9.6.zip
+
+- name: Copy Classic Editor Plugin
+  copy:
+    src=plugin/classic-editor.1.4.zip
+    dest=/tmp/classic-editor.1.4.zip
+
+- name: Install Krusze Theme
+  command: unzip -n /tmp/krusze.0.9.7.zip -d /srv/wordpress/wp-content/themes/
+
+- name: Install Jetpack Markdown Plugin
+  command: unzip -n /tmp/jetpack-markdown.3.9.6.zip -d /srv/wordpress/wp-content/plugins/
+
+- name: Install Classic Editor Plugin
+  command: unzip -n /tmp/classic-editor.1.4.zip -d /srv/wordpress/wp-content/plugins/
+
 - name: install SEManage
   yum: pkg=policycoreutils-python state=present
 
 - name: set the SELinux policy for the Wordpress directory
   command: semanage fcontext -a -t httpd_sys_content_t "/srv/wordpress(/.*)?"
-  
+
 - name: set the SELinux policy for wp-config.php
   command: semanage fcontext -a -t httpd_sys_script_exec_t "/srv/wordpress/wp-config\.php"
 

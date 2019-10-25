@@ -1,5 +1,19 @@
 ---
-- name: Install php-fpm and deps 
+
+- name: Install Remi PHP 7.x Repository
+  command: yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm -y
+  ignore_errors: true
+
+- name: Install yum-utils
+  yum:
+    name: ['yum-utils']
+    state: present
+  become: true
+
+- name: Enable Remi PHP 7.2 Repository
+  command: yum-config-manager --enable remi-php72
+
+- name: Install php-fpm and deps
   yum: name={{ item }} state=present
   with_items:
     - php
@@ -16,7 +30,7 @@
 - name: Disable default pool
   command: mv /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.disabled creates=/etc/php-fpm.d/www.disabled
   notify: restart php-fpm
- 
+
 - name: Copy php-fpm configuration
   template: src=wordpress.conf dest=/etc/php-fpm.d/
   notify: restart php-fpm
