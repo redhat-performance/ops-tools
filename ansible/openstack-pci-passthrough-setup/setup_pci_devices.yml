@@ -1,0 +1,94 @@
+---
+
+ - name: Setup Filter scheduler
+   hosts: controller
+   remote_user: heat-admin
+   tasks:
+     - name: filter scheduler
+       ini_file:
+         path: /etc/nova/nova.conf
+         option: baremetal_enabled_filters
+         value: "RetryFilter,AvailabilityZoneFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ExactRamFilter,ExactDiskFilter,ExactCoreFilter,PciPassthroughFilter"
+         section: filter_scheduler
+         backup: yes
+       become: true
+
+     - name: enable all filters
+       ini_file:
+         path: /etc/nova/nova.conf
+         option: available_filters
+         value: "nova.scheduler.filters.all_filters"
+         section: filter_scheduler
+         backup: yes
+       become: true
+
+ - name: Setup Whitelist
+   hosts: all
+   remote_user: heat-admin
+   tasks:
+     - name: set pci device alias
+       ini_file:
+         path: /etc/nova/nova.conf
+         option: alias
+         value: '{ "vendor_id":"{{vendor_id}}", "product_id":"{{product_id}}", "device_type":"{{passthrough_type}}", "name":"{{alias}}" }'
+         section: pci
+         backup: yes
+       become: true
+
+     - name: set pci device whitelist
+       ini_file:
+         path: /etc/nova/nova.conf
+         option: passthrough_whitelist
+         value: '{ "vendor_id": "{{vendor_id}}", "product_id": "{{product_id}}" }'
+         section: pci
+         backup: yes
+       become: true
+
+     - name: Tempalte file because ansible can't handle quoted quotes
+       template:
+         src: find_replace.sh
+         dest: /tmp/find_replace.sh
+
+     - name: Find and sub quotes because ansible does not allow \" in ini
+       shell: "bash /tmp/find_replace.sh"
+       become: true
+
+ - name: Edit grub
+   hosts: compute
+   remote_user: heat-admin
+   tasks:
+     - name: add iommu to grub
+       lineinfile:
+         dest: /etc/default/grub
+         line: "GRUB_CMDLINE_LINUX=\"console=tty0 console=ttyS0,115200n8 crashkernel=auto rhgb quiet intel_iommu=on pci-stub.ids={{vendor_id}}:{{product_id}}\""
+         regexp: '^GRUB_CMDLINE_LINUX'
+         state: present
+       become: true
+
+     - name: Regenerate grub config
+       shell: "grub2-mkconfig -o /boot/grub2/grub.cfg"
+       become: true
+
+ - name: Bounce controller nova services
+   hosts: all
+   remote_user: heat-admin
+   tasks:
+     - name: Bounce nova services
+       service:
+         name: "{{item}}"
+         state: restarted
+       become: true
+       with_items:
+         - openstack-nova-api
+         - openstack-nova-conductor
+         - openstack-nova-consoleauth
+         - openstack-nova-novncproxy
+         - openstack-nova-scheduler
+
+ - name: reboot the computes
+   hosts: compute
+   remote_user: heat-admin
+   tasks:
+     - name: reboot
+       shell: reboot now
+       become: true
