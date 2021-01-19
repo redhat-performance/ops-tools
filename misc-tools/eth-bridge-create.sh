@@ -110,7 +110,7 @@ create_br_int()
    sed -i "s/TYPE=Ethernet/TYPE=Bridge/g" /etc/sysconfig/network-scripts/ifcfg-$bridgename
    sed -i 's/TYPE="Ethernet"/TYPE=Bridge/g' /etc/sysconfig/network-scripts/ifcfg-$bridgename
    echo "BRIDGE=$bridgename" >> /etc/sysconfig/network-scripts/ifcfg-$ethname
-   echo "Restarting Network with new Bridge"
+   echo "Restarting Network with new Bridge .. this may take a while"
    /sbin/service network restart >/dev/null 2>&1
    /usr/bin/systemctl enable network  >/dev/null 2>&1
    echo "External Bridge: $bridgename created"
