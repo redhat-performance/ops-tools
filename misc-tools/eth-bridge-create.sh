@@ -24,6 +24,47 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# check that we have the right tools installed first.
+nettoolsinstalled=`rpm -qa | grep net-tools |wc -l`
+bridgeutilsinstalled=`rpm -qa | grep bridge-utils | wc -l`
+networkscriptsinstalled=`rpm -qa | grep network-scripts | head -n1 | wc -l`
+check_nettools() {
+	echo "checking for net-tools.."
+	if [[ $nettoolsinstalled = '0' ]]
+	then
+		echo "net-tools not installed.. installing"
+		yum install net-tools -y >/dev/null 2>&1
+        else
+        echo "[OK]"
+    fi
+}
+
+check_bridgeutils() {
+	echo "checking for bridge-utils.."
+	if [[ $bridgeutilsinstalled = '0' ]]
+	then
+		echo "bridge-utils not installed.. installing"
+		yum install bridge-utils -y >/dev/null 2>&1
+        else
+        echo "[OK]"
+    fi
+}
+
+check_netscripts() {
+	echo "checking for network-scripts.."
+	if [[ $networkscriptsinstalled = '0' ]]
+	then
+		echo "bridge-utils not installed.. installing"
+		yum install network-scripts -y >/dev/null 2>&1
+        else
+        echo "[OK]"
+    fi
+}
+# check net-tools and bridge-utils first
+check_nettools
+check_bridgeutils
+check_netscripts
+
 # check if NetworkManager is running/enabled
 nm_on=`systemctl status NetworkManager | grep running | wc -l`
 
@@ -62,34 +103,6 @@ if [[ $static -eq 1 ]]; then
     echo "No Static IP address detected, quitting!"
 	exit 1
 fi
-
-# check that we have the right tools installed first.
-nettoolsinstalled=`rpm -qa | grep net-tools |wc -l`
-bridgeutilsinstalled=`rpm -qa | grep bridge-utils | wc -l`
-check_nettools() {
-	echo "checking for net-tools.."
-	if [[ $nettoolsinstalled = '0' ]]
-	then
-		echo "net-tools not installed.. installing"
-		yum install net-tools -y >/dev/null 2>&1
-        else
-        echo "[OK]"
-    fi
-}
-
-check_bridgeutils() {
-	echo "checking for bridge-utils.."
-	if [[ $bridgeutilsinstalled = '0' ]]
-	then
-		echo "bridge-utils not installed.. installing"
-		yum install bridge-utils -y >/dev/null 2>&1
-        else
-        echo "[OK]"
-    fi
-}
-# check net-tools and bridge-utils first
-check_nettools
-check_bridgeutils
 
 check_br_exist()
 {  # check if there's a bridged interface
