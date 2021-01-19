@@ -54,7 +54,7 @@ check_netscripts() {
 	echo "checking for network-scripts.."
 	if [[ $networkscriptsinstalled = '0' ]]
 	then
-		echo "bridge-utils not installed.. installing"
+		echo "network-scripts is not installed.. installing"
 		yum install network-scripts -y >/dev/null 2>&1
         else
         echo "[OK]"
