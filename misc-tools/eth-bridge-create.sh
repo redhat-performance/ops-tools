@@ -30,8 +30,8 @@ nm_on=`systemctl status NetworkManager | grep running | wc -l`
 if [[ $nm_on -eq 1 ]]; then
     # gather and print some interface info.
 nmcli_active_con=`/usr/bin/nmcli con show | egrep "ethernet" | awk '{print $1}' | head -n1`
-nmcli_ip_addr=`nmcli con show $nmcli_active_con | grep "ipv4.addresses"| awk '{print $2}' | head -n1`
-nmcli_gateway=`nmcli con show $nmcli_active_con | grep "ipv4.gateway" | awk '{print $2}' | head -n1`
+nmcli_ip_addr=`/sbin/ifconfig $nmcli_active_con | grep inet | awk '{print $2}'`
+nmcli_gateway=`/sbin/route -n $nmcli_active_con | grep UG | awk '{print $2}' | head -n1`
 nmcli_dns1=`cat /etc/resolv.conf | grep nameserver | head -n1 | awk '{print $2}'`
 
     echo "Your current NetworkManager connection: $nmcli_active_con"
