@@ -35,7 +35,7 @@ change_el_repo() {
     cur_short=`echo ${el_current//.}`
     curdate=`/bin/date +%Y%m%d%H%M`
     for repo in $(cd /etc/yum.repos.d ; ls RHEL*-*.repo);
-        do cp $repo /root/$repo.$curdate;
+        do cp /etc/yum.repos/d/$repo /root/$repo.$curdate;
             done
     echo "Changing repository from $el_current to $el_target"
     sed -i "s/$el_current.0/$el_target.0/" /etc/yum.repos.d/RHEL*-*.repo
