@@ -24,9 +24,7 @@ host01.scalelab.example.com
 host02.scalelab.example.com
 ```
 
-* If you're using Scale Lab or ALIAS you can refer to the respective R&D wiki
-  assignment pages or your JIRA ticket for the host list or just ask one of the
-  DevOps team members to provide this for you.
+* If you're using Scale Lab or ALIAS you can refer to the respective R&D wiki assignment pages or your JIRA ticket for the host list or just ask one of the DevOps team members to provide this for you.
 
 #### Add SSH Keys
 
@@ -36,6 +34,17 @@ host02.scalelab.example.com
   - copy (append) your pubkey to ```install/roles/sshkeys/files/authorized_keys```
 ```
 cat ~/.ssh/id_dsa.pub >> install/roles/sshkeys/files/authorized_keys
+```
+
+#### Tell your SSH Not to Check Host Keys
+
+* Newer versions of Linux/Fedora may not allow `sshpass` to work without first having host keys, which you wouldn't without already accessing these hosts before to accept them.
+* Unless you want to first go and accept/manage the host keys of your new systems you should probably just add this to your `~/.ssh/config`
+
+```
+Host *.scalelab.redhat.com
+    StrictHostKeyChecking no
+    user root
 ```
 
 ### Running the Thing
