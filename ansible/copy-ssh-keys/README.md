@@ -24,10 +24,9 @@ host01.scalelab.example.com
 host02.scalelab.example.com
 ```
 
-* If you were using [QUADS](https://github.com/redhat-performance/quads) you might run:
-```
-/opt/quads/bin/quads-cli --cloud-only cloud02 >> hosts
-```
+* If you're using Scale Lab or ALIAS you can refer to the respective R&D wiki
+  assignment pages or your JIRA ticket for the host list or just ask one of the
+  DevOps team members to provide this for you.
 
 #### Add SSH Keys
 
