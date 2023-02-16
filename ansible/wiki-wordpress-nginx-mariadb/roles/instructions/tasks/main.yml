@@ -1,22 +1,10 @@
 
 ---
 # print informational messages after successful playbook run
-- name: Display Firewall Information
-  debug:
-    msg="When you are ready, add the following line to open up TCP/80 to configure Wordpress"
-
-- name: Display Firewall Command
-  debug:
-    msg="Add this to /etc/sysconfig/iptables under the TCP/22 rule -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT"
-
-- name: Restart Firewall
-  debug:
-    msg="Next, restart the firewall  systemctl restart iptables"
-
 - name: Display Wordpress Setup Info
   debug:
     msg="Access your Wordpress setup at http://{{ansible_fqdn}}"
 
 - name: Display Plugins and Themes
   debug:
-    msg="You'll probably want to also enable plugins Jetpack Markdown, Classic Editor and the Krusze Theme if used for QUADS"
+    msg="You'll probably want to also enable plugins Jetpack Markdown, Classic Editor and the Krusze Theme if used for QUADS, this is found in the settings area of wp-admin or http://yourhost/wp-admin"

@@ -4,6 +4,9 @@
 
 - name: Copy nginx configuration for wordpress
   template: src=default.conf dest=/etc/nginx/conf.d/default.conf
+
+- name: Simplify nginx.conf
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf
   notify: restart nginx
 
 - name: insert firewalld rule for nginx

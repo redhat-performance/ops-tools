@@ -1,12 +1,7 @@
 ## WordPress+Nginx+PHP-FPM+MariaDB Deployment
 
-- Requires Ansible 1.2 or newer
-- Expects CentOS 7.x host (this will work on RHEL7 but you'll need to provide your own php-fm packages) 
-
-RHEL7 version reflects changes in Red Hat Enterprise Linux and CentOS 7:
-1. Network device naming scheme has changed
-2. iptables is replaced with firewalld
-3. MySQL is replaced with MariaDB
+- Requires Ansible 2.0 or newer
+- Expects Rocky 8.x or CentOS Stream host. 
 
 These playbooks deploy a simple all-in-one configuration of the popular
 WordPress blogging platform and CMS, frontend by the Nginx web server and the
