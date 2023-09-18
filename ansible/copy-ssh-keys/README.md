@@ -42,7 +42,7 @@ cat ~/.ssh/id_dsa.pub >> install/roles/sshkeys/files/authorized_keys
 * Unless you want to first go and accept/manage the host keys of your new systems you should probably just add this to your `~/.ssh/config`
 
 ```
-Host *.scalelab.redhat.com
+Host *.scalelab.example.com
     StrictHostKeyChecking no
     user root
 ```
