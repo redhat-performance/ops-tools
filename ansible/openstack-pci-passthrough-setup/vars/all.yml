@@ -1,0 +1,12 @@
+# Use lspci -nn find the tupe of hex values xxxx:xxxx for the device you wish to pass
+# this will allow all devices of that make and model to be passed through. If you need
+# to pass through multiple unique devices rerun this playbook with different values
+# if you want those different devices to be treated the same, use the same alias
+vendor_id:
+product_id:
+# The identifier you will use in your flavor
+alias:
+# The method of passthrough used, options are type-PF (physical function)
+# type-VF (virtual function) for NFV and type-PCI for everything else
+# if you are trying to passthrough storage/gpu etc use type-PCI
+passthrough_type:
