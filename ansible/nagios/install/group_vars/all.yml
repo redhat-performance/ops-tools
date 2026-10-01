@@ -21,6 +21,9 @@ critical_proc: 1000
 # threshold for # of logged in users
 warning_users: 15
 critical_users: 30
+# threshold for system load averages (1,5,15 min)
+warning_load: [15, 10, 5]
+critical_load: [30, 25, 20]
 ### ELK options ###
 # if you use my ELK playbook you'll need this for HTTP checks
 # https://github.com/sadsfae/ansible-elk
